@@ -1,0 +1,119 @@
+{
+    "header": {
+        "bank_name": "BCA",
+        "owner_name": "Bambang Prayetno",
+        "owner_address": "KUALA LUMPUR DS. KAMPONG BHARU JL. kp. Bharu no.11 KOTA KUALA LUMPUR 13324 MALAYSIA",
+        "account_number": "5170384719",
+        "account_branch": null,
+        "account_type": "REKENING TAHAPAN XPRESI",
+        "total_pages": "1",
+        "period": "01/10/2022 - 31/10/2022",
+        "currency": "RM"
+    },
+    "item_line": [
+        {
+            "trx_date": "01/10/2022",
+            "trx_notes": "SALDO AWAL",
+            "trx_types": null,
+            "trx_mutation_db": null,
+            "trx_mutation_cr": null,
+            "balance": "1,779,000.00"
+        },
+        {
+            "trx_date": "02/10/2022",
+            "trx_notes": "TRSF E-BANKING CR 0205/FTSCY/WS95051 30000.00",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "300,000.00",
+            "balance": "2,079,000.00"
+        },
+        {
+            "trx_date": "02/10/2022",
+            "trx_notes": "TRSF E-BANKING DB 0205/FTFVA/WS138P1",
+            "trx_types": "DB",
+            "trx_mutation_db": "2,850.00",
+            "trx_mutation_cr": null,
+            "balance": "4,929,000.00"
+        },
+        {
+            "trx_date": "06/10/2022",
+            "trx_notes": "TRSF E-BANKING CR 0605/FTSCY/WS95051 500000.00 A15308581739858115",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "500,000.00",
+            "balance": null
+        },
+        {
+            "trx_date": "06/10/2022",
+            "trx_notes": "TARIKAN ATM 06/05",
+            "trx_types": "DB",
+            "trx_mutation_db": "500,000.00",
+            "trx_mutation_cr": null,
+            "balance": "4,929,000.00"
+        },
+        {
+            "trx_date": "09/10/2022",
+            "trx_notes": "TRSF E-BANKING CR 0605/FTSCY/WS95051 15000.00",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "150,000.00",
+            "balance": null
+        },
+        {
+            "trx_date": "09/10/2022",
+            "trx_notes": "TARIKAN ATM 08/07",
+            "trx_types": "DB",
+            "trx_mutation_db": "50,000.00",
+            "trx_mutation_cr": null,
+            "balance": "5,029,000.00"
+        },
+        {
+            "trx_date": "13/10/2022",
+            "trx_notes": "TRSF E-BANKING CR 1305/ACSCY/0000100 18071300379243",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "240,000.00",
+            "balance": "5,269,000.00"
+        },
+        {
+            "trx_date": "16/10/2022",
+            "trx_notes": "TRSF E-BANKING CR TANGGAL :14/05 1605/FTSCY/WS95051 38500.00 49338951",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "38,500.00",
+            "balance": null
+        },
+        {
+            "trx_date": "16/10/2022",
+            "trx_notes": "TRSF E-BANKING CR TANGGAL :15/05 1605/FTSCY/WS95051 374500.00 49503354",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "374,500.00",
+            "balance": null
+        },
+        {
+            "trx_date": "16/10/2022",
+            "trx_notes": "TRSF E-BANKING CR 1605/FTSCY/WS95051 50000.00",
+            "trx_types": "CR",
+            "trx_mutation_db": null,
+            "trx_mutation_cr": "50,000.00",
+            "balance": null
+        },
+        {
+            "trx_date": "16/10/2022",
+            "trx_notes": "TARIKAN PEMINDAHAN",
+            "trx_types": "DB",
+            "trx_mutation_db": "25,000.00",
+            "trx_mutation_cr": null,
+            "balance": null
+        },
+        {
+            "trx_date": "16/10/2022",
+            "trx_notes": "TARIKAN ATM 16/10",
+            "trx_types": "DB",
+            "trx_mutation_db": "1,000,000.00",
+            "trx_mutation_cr": null,
+            "balance": null
+        }
+    ]
+}

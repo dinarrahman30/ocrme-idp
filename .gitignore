@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+venv_old/
+ENV/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# SQLite / databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# dbt
+dbt_ocr/target/
+dbt_ocr/dbt_packages/
+dbt_ocr/logs/
+dbt_ocr/dbt_modules/
+
+# Dagster local storage/state (if any)
+.dagster/
+dagster_home/
+
+# Output / generated data files
+data/output/*
+!data/output/.gitkeep
+
+# Input data files
+data/input/*
+!data/input/.gitkeep
+

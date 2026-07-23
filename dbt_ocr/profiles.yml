@@ -1,0 +1,12 @@
+dbt_ocr_profile:
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: "{{ env_var('POSTGRES_USER', 'postgres') }}"
+      pass: "{{ env_var('POSTGRES_PASSWORD', 'postgres') }}"
+      port: 5432
+      dbname: "{{ env_var('POSTGRES_DB', 'ocr_dw') }}"
+      schema: public
+      threads: 4
+  target: dev

@@ -1,0 +1,14 @@
+numpy
+pandas
+opencv-python-headless
+pytesseract
+jiwer
+pdf2image
+pillow
+torch
+torchvision
+easyocr
+PyPDF2
+streamlit
+watchdog
+uvicorn
