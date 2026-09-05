@@ -2,7 +2,7 @@
 
 An enterprise-grade **Intelligent Document Processing (IDP)** system and multi-source ETL pipeline designed to automate text extraction, document classification, and structured data parsing from any document stack—including invoices, receipts, tax forms, identity cards (KTP), bank statements, Microsoft Office documents (`.docx`, `.xlsx`, `.pptx`), PDFs, images, and plain text/JSON files.
 
-> 🇮🇩 **Panduan Bahasa Indonesia**: Untuk panduan penggunaan aplikasi web bagi pengguna awam, silakan baca [PANDUAN_PENGGUNA.md](file:///home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/PANDUAN_PENGGUNA.md).
+> 🇮🇩 **Panduan Bahasa Indonesia**: Untuk panduan penggunaan aplikasi web bagi pengguna awam, silakan baca [PANDUAN_PENGGUNA.md](https://github.com/dinarrahman30/ocrme-idp/blob/main/PANDUAN_PENGGUNA.md).
 
 ---
 
