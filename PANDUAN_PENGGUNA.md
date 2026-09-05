@@ -163,4 +163,4 @@ Jawabannya: **Secara umum Sangat Aman**, karena aplikasi ini berjalan secara **L
 
 ---
 
-**Pengembang**: Dinar Wahyu Rahman ([dinarrahman30@gmail.com](mailto:dinarrahman30@gmail.com))
+**Author**: Dinar Wahyu Rahman ([dinarrahman30@gmail.com](mailto:dinarrahman30@gmail.com))
