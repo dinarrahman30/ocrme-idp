@@ -167,3 +167,12 @@
 2026-09-04 21:03:56,958 [INFO] Attempting LLM-based parsing with provider: gemini...
 2026-09-04 21:03:56,961 [INFO] MultiProviderLLMClient initialized with provider: gemini
 2026-09-04 21:04:53,118 [INFO] LLM parsing successful: invoice/Sales Invoice (confidence: 0.99)
+2026-09-05 12:47:46,177 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-05 12:47:46,198 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-05 12:48:49,816 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-05 12:48:58,091 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-05 12:49:00,704 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-05 12:49:00,859 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-05 12:49:13,126 [INFO] Attempting LLM-based parsing with provider: gemini...
+2026-09-05 12:49:13,127 [INFO] MultiProviderLLMClient initialized with provider: gemini
+2026-09-05 12:49:59,661 [INFO] LLM parsing successful: bank_statement/Rekening Koran / Account Statement (confidence: 0.99)
