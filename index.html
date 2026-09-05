@@ -42,8 +42,8 @@
       <button class="nav-tab" data-tab="tab-accuracy">
         <i data-lucide="target" style="width: 18px; height: 18px;"></i> Accuracy Evaluator
       </button>
-      <button class="nav-tab" data-tab="tab-api">
-        <i data-lucide="code-2" style="width: 18px; height: 18px;"></i> API & Vercel Guide
+      <button class="nav-tab" data-tab="tab-guide">
+        <i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Panduan Pengguna
       </button>
     </nav>
   </header>
@@ -296,40 +296,157 @@
       </div>
     </section>
 
-    <!-- TAB 4: API & VERCEL GUIDE -->
-    <section id="tab-api" class="tab-content">
-      <div class="grid-2">
-        <div class="card glass">
-          <div class="card-title">
-            <i data-lucide="cloud-lightning" style="color: var(--accent-amber);"></i>
-            <span>How to Deploy to Vercel</span>
+    <!-- TAB 4: PANDUAN PENGGUNA -->
+    <section id="tab-guide" class="tab-content">
+      <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Header Banner Card -->
+        <div class="card glass glass-glow" style="padding: 2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <div style="background: var(--accent-gradient); padding: 0.5rem; border-radius: 12px; display: flex;">
+                  <i data-lucide="book-marked" style="color: #fff; width: 26px; height: 26px;"></i>
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff;">Panduan Pengguna OCRMe IDP</h2>
+              </div>
+              <p style="color: var(--text-secondary); font-size: 0.95rem; max-width: 750px;">
+                Selamat datang di <strong>OCRMe — Intelligent Document Processing</strong>. Platform AI ini merubah dokumen fisik/digital (Faktur, Nota, KTP, Rekening Koran, PDF, Office) menjadi data terstruktur secara instan &amp; otomatis.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <span class="badge-vercel" style="background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Gemini AI &amp; LLM
+              </span>
+              <span class="badge-vercel" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #34d399; padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> 100% Offline Fallback
+              </span>
+            </div>
           </div>
-          <ol style="padding-left: 1.25rem; font-size: 0.9rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.75rem;">
-            <li>Install Vercel CLI pada komputer Anda:
-              <pre class="code-block" style="margin-top: 0.4rem;">npm install -g vercel</pre>
-            </li>
-            <li>Jalankan perintah deployment pada folder project ini:
-              <pre class="code-block" style="margin-top: 0.4rem;">vercel --prod</pre>
-            </li>
-            <li>Proyek OCRMe Web Anda langsung aktif secara instan dengan SSL HTTPS otomatis di Vercel!</li>
-          </ol>
         </div>
 
+        <!-- Langkah Cepat Membuka Aplikasi (Grid 3) -->
         <div class="card glass">
           <div class="card-title">
-            <i data-lucide="terminal" style="color: var(--accent-primary);"></i>
-            <span>REST API Endpoint Example</span>
+            <i data-lucide="rocket" style="color: var(--accent-amber);"></i>
+            <span>Langkah Cepat Menjalankan Aplikasi</span>
           </div>
-          <pre class="code-block">// Example cURL Request to Vercel Serverless Endpoint
-curl -X POST https://your-project.vercel.app/api/ocr \
-  -H "Content-Type: application/json" \
-  -d '{
-    "engine": "easyocr",
-    "parsing_mode": "auto"
-  }'</pre>
+          <div class="grid-3" style="margin-top: 1rem;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--bg-card-border); padding: 1.25rem; border-radius: var(--radius-sm);">
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: #60a5fa; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="terminal" style="width: 18px; height: 18px;"></i> 1. Python Local (Streamlit)
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Jalankan aplikasi berbasis Python Streamlit secara lokal di komputer Anda:</p>
+              <pre class="code-block" style="font-size: 0.8rem;">streamlit run app.py</pre>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--bg-card-border); padding: 1.25rem; border-radius: var(--radius-sm);">
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: #c084fc; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="container" style="width: 18px; height: 18px;"></i> 2. Docker Container
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Jalankan tanpa install dependencies menggunakan Docker Compose:</p>
+              <pre class="code-block" style="font-size: 0.8rem;">docker-compose up -d --build</pre>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--bg-card-border); padding: 1.25rem; border-radius: var(--radius-sm);">
+              <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: #34d399; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="cloud-upload" style="width: 18px; height: 18px;"></i> 3. Vercel Web Studio
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Deploy web studio ini secara instan ke Serverless Vercel Cloud:</p>
+              <pre class="code-block" style="font-size: 0.8rem;">vercel --prod</pre>
+            </div>
+          </div>
         </div>
+
+        <!-- Fitur Utama Overview (Grid 2) -->
+        <div class="grid-2">
+          <div class="card glass">
+            <div class="card-title">
+              <i data-lucide="sliders" style="color: var(--accent-primary);"></i>
+              <span>Panduan Fitur Utama Studio</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.88rem; color: var(--text-secondary);">
+              <div>
+                <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                  <i data-lucide="file-text" style="width: 16px; height: 16px; color: #60a5fa;"></i> 1. Document Processor
+                </strong>
+                Unggah dokumen (PDF, Gambar, Word, Excel) &#10145; Pilih OCR Engine (EasyOCR / Tesseract) &amp; AI Model (Gemini, OpenAI, Claude, Ollama) &#10145; Klik "Process" untuk ekstraksi JSON, Tabel CSV, &amp; Teks Asli.
+              </div>
+              <div>
+                <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                  <i data-lucide="bar-chart-3" style="width: 16px; height: 16px; color: #c084fc;"></i> 2. Database &amp; Analytics
+                </strong>
+                Pantau total dokumen terproses, persentase akurasi, rasio auto-parsing AI, serta visualisasi grafik distribusi kategori dokumen.
+              </div>
+              <div>
+                <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                  <i data-lucide="target" style="width: 16px; height: 16px; color: #f43f5e;"></i> 3. Accuracy Evaluator
+                </strong>
+                Uji presisi ekstraksi dengan membandingkan hasil OCR terhadap teks asli <em>Ground Truth</em> untuk menghitung skor CER &amp; WER.
+              </div>
+            </div>
+          </div>
+
+          <div class="card glass">
+            <div class="card-title">
+              <i data-lucide="shield-check" style="color: var(--accent-emerald);"></i>
+              <span>Keamanan &amp; Privasi Data</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              Sistem mendukung pemrosesan <strong>100% Offline Lokal</strong> untuk menjamin keamanan penuh dokumen sensitif.
+            </p>
+            <div class="table-container">
+              <table style="font-size: 0.8rem;">
+                <thead>
+                  <tr>
+                    <th>Jenis Dokumen</th>
+                    <th>Mode Disarankan</th>
+                    <th>Keamanan Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Publik / Umum</strong><br>(Invoice, Nota Toko)</td>
+                    <td><span style="color: #60a5fa; font-weight: 600;">Mode AI Gemini / Cloud</span></td>
+                    <td><span style="color: #34d399;">🛡️ Terenkripsi HTTPS</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sensitif / Rahasia</strong><br>(KTP, Rekening Bank)</td>
+                    <td><span style="color: #fbbf24; font-weight: 600;">Mode Offline (Regex Only)</span></td>
+                    <td><span style="color: #34d399;">🔒 100% Isolasi Lokal (0 Byte Out)</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Card -->
+        <div class="card glass">
+          <div class="card-title">
+            <i data-lucide="help-circle" style="color: var(--accent-rose);"></i>
+            <span>Pertanyaan Umum (FAQ)</span>
+          </div>
+          <div class="grid-3" style="gap: 1rem; margin-top: 0.75rem;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--bg-card-border); padding: 1rem; border-radius: var(--radius-sm);">
+              <h5 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem;">Apakah wajib API Key?</h5>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Tidak wajib. Tanpa API Key, sistem otomatis aktif dalam <strong>Mode Offline (Regex Fallback)</strong> secara gratis tanpa internet.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--bg-card-border); padding: 1rem; border-radius: var(--radius-sm);">
+              <h5 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem;">Format file apa yang didukung?</h5>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Mendukung PDF (digital &amp; scan), Gambar (PNG, JPG, WEBP), dan Dokumen Office (Word <code>.docx</code>, Excel <code>.xlsx</code>).</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--bg-card-border); padding: 1rem; border-radius: var(--radius-sm);">
+              <h5 style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.4rem;">Di mana data disimpan?</h5>
+              <p style="font-size: 0.82rem; color: var(--text-secondary);">Semua hasil ekstraksi tersimpan di database lokal <code>data/ocr_database.db</code> dan dapat diunduh ke JSON / CSV / TXT.</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
+
+
   </main>
 
   <footer>
