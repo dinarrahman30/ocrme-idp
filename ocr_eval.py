@@ -477,9 +477,10 @@ def main():
     if mode == "2":
         print("\n--- EVALUASI AKURASI PARSING ---")
         
-        gt_json = input("Masukkan path file Ground Truth JSON (cth: JSON EXAMPLE.json): ").strip()
+        gt_json = input("Masukkan path file Ground Truth JSON (cth: examples/sample_bank_statement.json): ").strip()
         if not os.path.exists(gt_json):
             candidate_paths = [
+                os.path.join("examples", gt_json),
                 os.path.join("data", gt_json),
                 os.path.join("data/output", gt_json),
                 gt_json

@@ -1,5 +1,0 @@
-Prototype,
-- belum sempurna dalam output .json.
-- masih berantakan untuk output pada file jenis image/gambar.
-- kurang tampilan interaktif.
-- belum dicoba untuk format lain selain rekening bank.
