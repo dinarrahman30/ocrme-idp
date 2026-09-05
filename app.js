@@ -409,32 +409,128 @@ function renderResults(res, uploadedFile = null) {
   }
 }
 
+// Helper function to escape HTML characters
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // Render Interactive Document Preview Card
 function renderDocumentPreview(res, uploadedFile = null) {
   const box = document.getElementById('preview-display-box');
   if (!box) return;
 
-  if (uploadedFile && uploadedFile.type && uploadedFile.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
+  // Real Uploaded File Preview Handler
+  if (uploadedFile) {
+    const fileType = uploadedFile.type || '';
+    const fileName = uploadedFile.name || 'Dokumen';
+    const fileSize = (uploadedFile.size / 1024).toFixed(1);
+    const fileExt = fileName.split('.').pop().toLowerCase();
+
+    // 1. IMAGE FILES PREVIEW (PNG, JPG, WEBP, SVG, BMP)
+    if (fileType.startsWith('image/') || ['png', 'jpg', 'jpeg', 'webp', 'svg', 'bmp'].includes(fileExt)) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        box.innerHTML = `
+          <div style="width: 100%; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div style="font-size: 0.85rem; font-weight: 600; color: #60a5fa; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="image" style="width: 16px; height: 16px;"></i> Pratinjau Gambar Asli (${fileName})
+              </div>
+              <span style="font-size: 0.75rem; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <i data-lucide="scan" style="width: 12px; height: 12px;"></i> Visual OCR Detection Active
+              </span>
+            </div>
+            <div style="position: relative; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--bg-card-border); max-height: 420px; display: flex; justify-content: center; background: #060911; padding: 0.75rem;">
+              <img src="${e.target.result}" style="max-height: 400px; max-width: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" alt="${fileName}">
+            </div>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      };
+      reader.readAsDataURL(uploadedFile);
+      return;
+    }
+
+    // 2. PDF FILES PREVIEW (.pdf)
+    if (fileType === 'application/pdf' || fileExt === 'pdf') {
+      const blobUrl = URL.createObjectURL(uploadedFile);
       box.innerHTML = `
         <div style="width: 100%; text-align: left;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
             <div style="font-size: 0.85rem; font-weight: 600; color: #60a5fa; display: flex; align-items: center; gap: 0.4rem;">
-              <i data-lucide="image" style="width: 16px; height: 16px;"></i> User Document Image Preview
+              <i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Pratinjau Dokumen PDF Asli (${fileName} - ${fileSize} KB)
             </div>
-            <span style="font-size: 0.75rem; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);">
-              <i data-lucide="scan" style="width: 12px; height: 12px;"></i> OCR Bounding Layer Active
-            </span>
+            <a href="${blobUrl}" target="_blank" style="font-size: 0.75rem; color: #60a5fa; text-decoration: none; background: rgba(59, 130, 246, 0.15); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); display: flex; align-items: center; gap: 0.3rem;">
+              <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> Buka PDF di Tab Baru
+            </a>
           </div>
-          <div style="position: relative; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--bg-card-border); max-height: 380px; display: flex; justify-content: center; background: #000; padding: 0.5rem;">
-            <img src="${e.target.result}" style="max-height: 360px; max-width: 100%; object-fit: contain;" alt="Uploaded Document Preview">
+          <div style="border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--bg-card-border); background: #0d1322;">
+            <iframe src="${blobUrl}" width="100%" height="400px" style="border: none; display: block;" title="PDF Preview"></iframe>
           </div>
         </div>
       `;
       if (window.lucide) lucide.createIcons();
-    };
-    reader.readAsDataURL(uploadedFile);
+      return;
+    }
+
+    // 3. TEXT / CODE FILES PREVIEW (TXT, JSON, CSV, MD, XML)
+    if (fileType.startsWith('text/') || ['txt', 'json', 'csv', 'md', 'xml', 'html', 'rtf'].includes(fileExt)) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        box.innerHTML = `
+          <div style="width: 100%; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div style="font-size: 0.85rem; font-weight: 600; color: #34d399; display: flex; align-items: center; gap: 0.4rem;">
+                <i data-lucide="file-code" style="width: 16px; height: 16px;"></i> Pratinjau Berkas Teks Asli (${fileName})
+              </div>
+              <span style="font-size: 0.75rem; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 0.2rem 0.6rem; border-radius: 6px;">
+                ${fileSize} KB
+              </span>
+            </div>
+            <pre class="code-block" style="max-height: 380px; overflow-y: auto; color: #e2e8f0; font-size: 0.82rem; font-family: var(--font-mono);">${escapeHtml(e.target.result)}</pre>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      };
+      reader.readAsText(uploadedFile);
+      return;
+    }
+
+    // 4. OTHER OFFICE DOCUMENTS (DOCX, XLSX, PPTX, etc.)
+    box.innerHTML = `
+      <div style="width: 100%; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <div style="font-size: 0.85rem; font-weight: 600; color: #c084fc; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="file-archive" style="width: 16px; height: 16px;"></i> Inspeksi Berkas Dokumen Asli (${fileName})
+          </div>
+          <span style="font-size: 0.75rem; color: #c084fc; background: rgba(139, 92, 246, 0.15); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(139, 92, 246, 0.3);">
+            FORMAT ${fileExt.toUpperCase()}
+          </span>
+        </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 1.5rem; text-align: center;">
+          <div style="background: rgba(139, 92, 246, 0.1); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: #c084fc;">
+            <i data-lucide="file-check-2" style="width: 32px; height: 32px;"></i>
+          </div>
+          <h4 style="font-weight: 600; color: #fff; margin-bottom: 0.3rem;">${fileName}</h4>
+          <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1rem;">
+            Ukuran Berkas: ${fileSize} KB | Tanggal File: ${new Date(uploadedFile.lastModified || Date.now()).toLocaleDateString()}
+          </p>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--bg-card-border); border-radius: 8px; padding: 1rem; text-align: left; font-size: 0.82rem;">
+            <div style="font-weight: 600; color: #34d399; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.3rem;">
+              <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Berkas ${fileExt.toUpperCase()} Siap Diproses OCR &amp; AI LLM
+            </div>
+            <div style="color: #94a3b8;">Sistem secara otomatis mengekstrak teks &amp; data tabel dari file ${fileName}. Buka tab <strong>Structured JSON</strong> atau <strong>Line Items Table</strong> di atas untuk melihat data terurai.</div>
+          </div>
+        </div>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
     return;
   }
 
