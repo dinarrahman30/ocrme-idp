@@ -217,8 +217,9 @@ with st.sidebar:
     dev_toggle = st.toggle("🔐 Developer mode", value=is_developer, help="Unlock raw database inspector, audit logs, and domain tables.")
     if dev_toggle != is_developer:
         if dev_toggle:
-            dev_pass = st.text_input("Developer password", type="password", key="dev_pass_input", placeholder="Ketik sandi developer (cth: admin)...")
-            if dev_pass in ["admin", "developer", "ocrme"]:
+            dev_pass = st.text_input("Developer password", type="password", key="dev_pass_input", placeholder="Ketik sandi developer...")
+            valid_dev_pass = os.getenv("DEV_PASSWORD", r'u8"V&U$Z94gU,v?')
+            if dev_pass == valid_dev_pass:
                 st.session_state["dev_authenticated"] = True
                 st.toast("Developer mode unlocked!", icon="🔓")
                 st.rerun()
@@ -697,7 +698,7 @@ with tab_database:
     def render_dev_lock_notice():
         with st.container(border=True):
             st.markdown("##### :material/shield_lock: Developer Private Access Required")
-            st.info("Inspeksi raw database, audit log, dan tabel spesifik ini diproteksi khusus untuk Developer. Aktifkan **Developer mode** pada sidebar sebelah kiri (masukkan password `admin`) untuk membuka akses.", icon=":material/lock:")
+            st.info("Inspeksi raw database, audit log, dan tabel spesifik ini diproteksi khusus untuk Developer. Aktifkan **Developer mode** pada sidebar sebelah kiri untuk membuka akses.", icon=":material/lock:")
 
     # --------------------------------------------------------------------------
     # Sub-tab 2: PRIVATE — All parsed documents with filter & JSON viewer
