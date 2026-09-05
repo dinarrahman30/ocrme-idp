@@ -33,20 +33,30 @@
       </span>
     </a>
 
-    <nav>
-      <button class="nav-tab active" data-tab="tab-processor">
-        <i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Document Processor
-      </button>
-      <button class="nav-tab" data-tab="tab-analytics">
-        <i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Database & Analytics
-      </button>
-      <button class="nav-tab" data-tab="tab-accuracy">
-        <i data-lucide="target" style="width: 18px; height: 18px;"></i> Accuracy Evaluator
-      </button>
-      <button class="nav-tab" data-tab="tab-guide">
-        <i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Panduan Pengguna
-      </button>
-    </nav>
+    <div class="header-right">
+      <nav>
+        <button class="nav-tab active" data-tab="tab-processor" data-i18n="nav_processor">
+          <i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Document Processor
+        </button>
+        <button class="nav-tab" data-tab="tab-analytics" data-i18n="nav_analytics">
+          <i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Database & Analytics
+        </button>
+        <button class="nav-tab" data-tab="tab-accuracy" data-i18n="nav_accuracy">
+          <i data-lucide="target" style="width: 18px; height: 18px;"></i> Accuracy Evaluator
+        </button>
+        <button class="nav-tab" data-tab="tab-guide" data-i18n="nav_guide">
+          <i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Panduan Pengguna
+        </button>
+      </nav>
+
+      <div class="lang-selector">
+        <i data-lucide="globe" style="width: 16px; height: 16px; color: var(--accent-primary);"></i>
+        <select id="langSelector" class="lang-select" aria-label="Select Language">
+          <option value="id">🇮🇩 ID</option>
+          <option value="en">🇬🇧 EN</option>
+        </select>
+      </div>
+    </div>
   </header>
 
   <main>

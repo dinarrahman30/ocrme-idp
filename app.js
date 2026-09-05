@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDragAndDrop();
   initViewSwitcher();
   initAnalyticsCharts();
+  initLanguageSelector();
 
   // Attach event listener to Process button
   const processBtn = document.getElementById('btn-process');
@@ -924,5 +925,51 @@ function initAnalyticsCharts() {
         }
       }
     });
+  }
+}
+
+// ==========================================================================
+// Language Selector & i18n Engine (Vercel Edition)
+// ==========================================================================
+const I18N_DICT = {
+  id: {
+    nav_processor: '<i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Ekstraksi Dokumen',
+    nav_analytics: '<i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Ringkasan & Analitik',
+    nav_accuracy: '<i data-lucide="target" style="width: 18px; height: 18px;"></i> Evaluasi Akurasi',
+    nav_guide: '<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Panduan Pengguna'
+  },
+  en: {
+    nav_processor: '<i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Document Extraction',
+    nav_analytics: '<i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Summary & Analytics',
+    nav_accuracy: '<i data-lucide="target" style="width: 18px; height: 18px;"></i> Accuracy Evaluator',
+    nav_guide: '<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> User Guide'
+  }
+};
+
+function initLanguageSelector() {
+  const langSelect = document.getElementById('langSelector');
+  if (!langSelect) return;
+
+  const savedLang = localStorage.getItem('ocrme_lang') || 'id';
+  langSelect.value = savedLang;
+  applyLanguage(savedLang);
+
+  langSelect.addEventListener('change', (e) => {
+    const selectedLang = e.target.value;
+    localStorage.setItem('ocrme_lang', selectedLang);
+    applyLanguage(selectedLang);
+  });
+}
+
+function applyLanguage(lang) {
+  const dict = I18N_DICT[lang] || I18N_DICT['id'];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) {
+      el.innerHTML = dict[key];
+    }
+  });
+  if (window.lucide) {
+    lucide.createIcons();
   }
 }

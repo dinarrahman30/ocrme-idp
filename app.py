@@ -208,23 +208,39 @@ init_db()
 # Sidebar Control & Configuration Panel
 # ==============================================================================
 with st.sidebar:
-    st.markdown("### :material/tune: Control panel")
-    st.caption("Configure AI providers, models, OCR engines, and API keys.")
+    st.markdown("### 🌐 Bahasa / Language")
+    lang_choice = st.radio(
+        "Pilih Bahasa / Select Language",
+        options=["Bahasa Indonesia 🇮🇩", "English 🇬🇧"],
+        index=0,
+        horizontal=True,
+        key="app_lang_radio",
+        label_visibility="collapsed"
+    )
+    is_en = "English" in lang_choice
+
+    st.divider()
+
+    st.markdown(f"### :material/tune: {'Control panel' if is_en else 'Panel kontrol'}")
+    st.caption("Configure AI providers, models, OCR engines, and API keys." if is_en else "Atur penyedia AI, model, mesin OCR, dan kunci API.")
     st.space("small")
 
     # Developer Mode Authentication Toggle
     is_developer = st.session_state.get("dev_authenticated", False)
-    dev_toggle = st.toggle("🔐 Developer mode", value=is_developer, help="Unlock raw database inspector, audit logs, and domain tables.")
+    dev_toggle_label = "🔐 Developer mode" if is_en else "🔐 Mode developer"
+    dev_toggle_help = "Unlock raw database inspector, audit logs, and domain tables." if is_en else "Buka kunci inspektur basis data mentah, log audit, dan tabel domain."
+    dev_toggle = st.toggle(dev_toggle_label, value=is_developer, help=dev_toggle_help)
     if dev_toggle != is_developer:
         if dev_toggle:
-            dev_pass = st.text_input("Developer password", type="password", key="dev_pass_input", placeholder="Ketik sandi developer...")
+            pass_placeholder = "Enter developer password..." if is_en else "Ketik sandi developer..."
+            dev_pass = st.text_input("Developer password" if is_en else "Sandi developer", type="password", key="dev_pass_input", placeholder=pass_placeholder)
             valid_dev_pass = os.getenv("DEV_PASSWORD", r'u8"V&U$Z94gU,v?')
             if dev_pass == valid_dev_pass:
                 st.session_state["dev_authenticated"] = True
                 st.toast("Developer mode unlocked!", icon="🔓")
                 st.rerun()
             elif dev_pass:
-                st.error("Sandi developer salah.", icon=":material/lock:")
+                st.error("Invalid developer password." if is_en else "Sandi developer salah.", icon=":material/lock:")
         else:
             st.session_state["dev_authenticated"] = False
             st.toast("Developer mode locked", icon="🔒")
@@ -233,7 +249,7 @@ with st.sidebar:
     st.space("small")
 
     # AI Provider Selection Dropdown
-    st.markdown("**AI provider selection**")
+    st.markdown(f"**{'AI provider selection' if is_en else 'Pilihan penyedia AI'}**")
     ai_provider = st.selectbox(
         "AI provider",
         options=["gemini", "openai", "claude", "ollama"],
@@ -253,7 +269,7 @@ with st.sidebar:
             "OpenAI API key",
             value="",
             type="password",
-            placeholder="Masukkan OpenAI API Key Anda",
+            placeholder="Enter your OpenAI API key" if is_en else "Masukkan OpenAI API Key Anda",
             help="Enter your OpenAI API Key."
         )
         if api_key_input:
@@ -267,7 +283,7 @@ with st.sidebar:
             "Anthropic API key",
             value="",
             type="password",
-            placeholder="Masukkan Anthropic API Key Anda",
+            placeholder="Enter your Anthropic API key" if is_en else "Masukkan Anthropic API Key Anda",
             help="Enter your Anthropic Claude API Key."
         )
         if api_key_input:
@@ -286,7 +302,7 @@ with st.sidebar:
             value="",
             type="password",
             help="Paste your Google Gemini API key to enable AI multi-category adaptive extraction.",
-            placeholder="Masukkan Gemini API Key Anda"
+            placeholder="Enter your Gemini API key" if is_en else "Masukkan Gemini API Key Anda"
         )
         if api_key_input:
             os.environ["GEMINI_API_KEY"] = api_key_input
@@ -297,7 +313,7 @@ with st.sidebar:
     st.space("small")
 
     # OCR Engine Selector
-    st.markdown("**OCR engine selection**")
+    st.markdown(f"**{'OCR engine selection' if is_en else 'Pilihan mesin OCR'}**")
     engine_choice = st.segmented_control(
         "OCR engine",
         options=["easyocr", "tesseract"],
@@ -309,7 +325,7 @@ with st.sidebar:
     st.space("small")
 
     # Parsing Method Selector
-    st.markdown("**Parsing & AI mode**")
+    st.markdown(f"**{'Parsing & AI mode' if is_en else 'Mode ekstraksi & AI'}**")
     parsing_mode = st.segmented_control(
         "Parsing mode",
         options=["auto", "llm", "regex"],
@@ -326,7 +342,7 @@ with st.sidebar:
 
     # System Status Card
     with st.container(border=True):
-        st.markdown("##### :material/monitor_heart: System status")
+        st.markdown(f"##### :material/monitor_heart: {'System status' if is_en else 'Status sistem'}")
         has_key = bool(api_key_input) or ai_provider == "ollama"
         if has_key:
             st.caption(":material/check_circle: **AI Provider**: Active")
@@ -337,10 +353,10 @@ with st.sidebar:
         st.caption(f":material/schema: **Parsing Mode**: {parsing_mode.upper()}")
 
     st.space("medium")
-    st.markdown("""
+    st.markdown(f"""
     <div style="font-size: 12px; color: #64748b; line-height: 1.5; text-align: center;">
         OCRMe v2.5 General Document Engine<br/>
-        Supported formats: PDF, Image, Word, Excel, PPT, Text, JSON
+        {'Supported formats' if is_en else 'Format didukung'}: PDF, Image, Word, Excel, PPT, Text, JSON
     </div>
     """, unsafe_allow_html=True)
 
@@ -349,22 +365,28 @@ with st.sidebar:
 # ==============================================================================
 
 # Top Header Hero Banner
-st.markdown("""
+hero_badge = "✨ OCRMe — Intelligent Document Processing Engine" if is_en else "✨ OCRMe — Pembaca & Ekstraktor Dokumen Otomatis"
+hero_title = "📄 Automatic Document Data Extraction" if is_en else "📄 Ekstraksi Data Dokumen Otomatis"
+hero_subtitle = (
+    "Upload photos or documents (ID Cards, Receipts, Invoices, Bank Statements, Letters, Word, PDF, Excel) to automatically extract structured data without manual typing."
+    if is_en else
+    "Unggah foto atau dokumen (KTP, Nota, Faktur/Invoice, Rekening Koran, Surat, Word, PDF, Excel) untuk membaca dan mengekstrak data secara otomatis tanpa perlu diketik manual."
+)
+
+st.markdown(f"""
 <div class="main-header-card">
-    <div class="badge-pill">✨ OCRMe — Pembaca & Ekstraktor Dokumen Otomatis</div>
-    <div class="main-title">📄 Ekstraksi Data Dokumen Otomatis</div>
-    <div class="main-subtitle">
-        Unggah foto atau dokumen (KTP, Nota, Faktur/Invoice, Rekening Koran, Surat, Word, PDF, Excel) untuk membaca dan mengekstrak data secara otomatis tanpa perlu diketik manual.
-    </div>
+    <div class="badge-pill">{hero_badge}</div>
+    <div class="main-title">{hero_title}</div>
+    <div class="main-subtitle">{hero_subtitle}</div>
 </div>
 """, unsafe_allow_html=True)
 
-# Main Navigation Tabs (Minimalist & User-Friendly Casing)
+# Main Navigation Tabs (Bilingual)
 tab_playground, tab_database, tab_guide, tab_advanced = st.tabs([
-    "📄 Ekstraksi dokumen",
-    "📊 Ringkasan & statistik",
-    "📘 Panduan pengguna",
-    "⚙️ Fitur lanjutan & batch"
+    "📄 Document extraction" if is_en else "📄 Ekstraksi dokumen",
+    "📊 Summary & analytics" if is_en else "📊 Ringkasan & statistik",
+    "📘 User guide" if is_en else "📘 Panduan pengguna",
+    "⚙️ Advanced & batch features" if is_en else "⚙️ Fitur lanjutan & batch"
 ])
 
 # ==============================================================================
