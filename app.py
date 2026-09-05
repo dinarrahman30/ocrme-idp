@@ -350,34 +350,33 @@ with st.sidebar:
 # Top Header Hero Banner
 st.markdown("""
 <div class="main-header-card">
-    <div class="badge-pill">✨ Universal Document Intelligence System</div>
-    <div class="main-title">🔍 OCRMe — Intelligent Document Processing</div>
+    <div class="badge-pill">✨ OCRMe — Pembaca & Ekstraktor Dokumen Otomatis</div>
+    <div class="main-title">📄 Ekstraksi Data Dokumen Otomatis</div>
     <div class="main-subtitle">
-        Automated text extraction, multi-category document classification, and AI-powered structured data parsing for any document type—invoices, receipts, tax forms, identity cards, bank statements, spreadsheets, and Office files.
+        Unggah foto atau dokumen (KTP, Nota, Faktur/Invoice, Rekening Koran, Surat, Word, PDF, Excel) untuk membaca dan mengekstrak data secara otomatis tanpa perlu diketik manual.
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Main Navigation Tabs
-tab_playground, tab_database, tab_eval, tab_etl, tab_guide = st.tabs([
-    "📑 Document processor",
-    "📊 Database & analytics",
-    "🎯 Accuracy evaluator",
-    "⚙️ Batch ETL pipeline",
-    "📘 Panduan pengguna"
+# Main Navigation Tabs (Minimalist & User-Friendly Casing)
+tab_playground, tab_database, tab_guide, tab_advanced = st.tabs([
+    "📄 Ekstraksi dokumen",
+    "📊 Ringkasan & statistik",
+    "📘 Panduan pengguna",
+    "⚙️ Fitur lanjutan & batch"
 ])
 
 # ==============================================================================
-# TAB 1: Live Document Processor & Playground
+# TAB 1: Live Document Processor & Playground (Sederhana & Mudah)
 # ==============================================================================
 with tab_playground:
-    st.markdown("#### :material/file_present: Process Single Document")
-    st.caption("Upload any file format or enter a local file path to run instant extraction & multi-modal AI parsing.")
+    st.markdown("#### :material/file_present: Unggah & Proses Dokumen Tunggal")
+    st.caption("Pilih file dari komputer Anda atau ketik jalur berkas lokal untuk membaca dan mengekstrak data secara otomatis.")
 
     input_method = st.segmented_control(
-        "Input method",
+        "Metode input",
         options=["upload", "local_path"],
-        format_func=lambda x: "☁️ Upload file (drag & drop)" if x == "upload" else "💻 Local file path",
+        format_func=lambda x: "☁️ Upload file (seret & lepas)" if x == "upload" else "💻 Alamat file lokal",
         default="upload",
         label_visibility="collapsed"
     )
@@ -387,20 +386,12 @@ with tab_playground:
     file_ext = None
 
     if input_method == "upload":
-        st.markdown("""
-        <div>
-            <span class="format-badge fmt-pdf">PDF</span>
-            <span class="format-badge fmt-img">PNG / JPG / WEBP</span>
-            <span class="format-badge fmt-doc">DOCX / PPTX</span>
-            <span class="format-badge fmt-xls">XLSX / CSV</span>
-            <span class="format-badge fmt-doc">TXT / JSON</span>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(":red-badge[PDF] :blue-badge[Foto / Gambar] :green-badge[Word / PPT] :orange-badge[Excel / CSV] :purple-badge[Teks / JSON]")
         
         uploaded_file = st.file_uploader(
-            "Choose a document file",
+            "Pilih berkas dokumen",
             type=None,
-            help="Drag and drop any document format (PDF, PNG, JPG, DOCX, XLSX, TXT, JSON, etc.)",
+            help="Tarik dan lepas berkas dokumen apa saja (PDF, PNG, JPG, DOCX, XLSX, TXT, JSON, dll.)",
             label_visibility="collapsed"
         )
 
@@ -414,26 +405,26 @@ with tab_playground:
     else:
         with st.container(border=True):
             local_path = st.text_input(
-                "Enter local file path on your computer",
-                placeholder="/home/user/Documents/invoice.pdf or C:\\Scans\\document.docx",
-                help="Enter any absolute or relative path to a file on your filesystem."
+                "Masukkan alamat file di komputer Anda",
+                placeholder="/home/user/Dokumen/nota.pdf atau C:\\Scans\\faktur.docx",
+                help="Ketik alamat lokasi berkas pada komputer Anda."
             )
             if local_path and os.path.exists(local_path):
                 tmp_path = os.path.abspath(os.path.expanduser(local_path))
                 file_name = os.path.basename(tmp_path)
                 file_ext = os.path.splitext(file_name.lower())[1]
-                st.caption(f":material/check_circle: File found: `{tmp_path}`")
+                st.caption(f":material/check_circle: Berkas ditemukan: `{tmp_path}`")
             elif local_path:
-                st.caption(f":material/error: File not found: `{local_path}`")
+                st.caption(f":material/error: Berkas tidak ditemukan: `{local_path}`")
 
     # Quick sample test helper (if files exist in data/input)
     if tmp_path is None and os.path.exists(DEFAULT_INPUT_DIR):
         all_in_folder = [os.path.join(DEFAULT_INPUT_DIR, f) for f in os.listdir(DEFAULT_INPUT_DIR) if not f.startswith(".")]
         if all_in_folder:
             st.space("small")
-            with st.expander("💡 Or test quickly with a sample document from data/input", icon=":material/lightbulb:"):
-                sample_selected = st.selectbox("Select sample file", options=["Select sample file..."] + [os.path.basename(f) for f in all_in_folder])
-                if sample_selected != "Select sample file...":
+            with st.expander("💡 Atau coba langsung dengan contoh dokumen dari sampel data/input", icon=":material/lightbulb:"):
+                sample_selected = st.selectbox("Pilih berkas contoh", options=["Pilih berkas contoh..."] + [os.path.basename(f) for f in all_in_folder])
+                if sample_selected != "Pilih berkas contoh...":
                     tmp_path = os.path.join(DEFAULT_INPUT_DIR, sample_selected)
                     file_name = sample_selected
                     file_ext = os.path.splitext(file_name.lower())[1]
@@ -852,156 +843,146 @@ with tab_database:
     conn.close()
 
 # ==============================================================================
-# TAB 3: Accuracy Evaluator Suite
+# TAB 4: Fitur Lanjutan & Batch (Advanced ETL & Evaluator)
 # ==============================================================================
-with tab_eval:
-    st.markdown("#### :material/target: Accuracy Evaluator Suite")
-    st.caption("Evaluate OCR character accuracy (CER/WER) or JSON field extraction accuracy against ground truth benchmarks.")
+with tab_advanced:
+    st.markdown("#### :material/settings: Fitur Lanjutan & Pemrosesan Batch")
+    st.caption("Gunakan menu ini untuk memproses banyak berkas sekaligus dalam satu folder atau menguji tingkat akurasi ekstraksi.")
 
-    eval_mode = st.segmented_control(
-        "Evaluation mode",
-        options=["ocr", "json"],
-        format_func=lambda x: "🔤 OCR Accuracy (CER/WER)" if x == "ocr" else "📦 JSON Parsing Field Accuracy",
-        default="ocr",
-        label_visibility="collapsed"
-    )
+    adv_tab1, adv_tab2 = st.tabs([
+        "⚙️ Pemrosesan batch (Banyak berkas)",
+        "🎯 Pengujian akurasi (CER / WER)"
+    ])
 
-    st.space("small")
+    with adv_tab1:
+        st.markdown("##### Pemrosesan otomatis folder berkas")
+        st.caption("Pindai dan proses seluruh dokumen di dalam direktori folder sekaligus.")
 
-    if eval_mode == "ocr":
-        col_gt, col_ocr = st.columns(2, gap="medium")
-        with col_gt:
-            with st.container(border=True):
-                st.markdown("<div class='section-card-title'>:material/description: Ground Truth Document</div>", unsafe_allow_html=True)
-                gt_file = st.file_uploader("Upload ground truth file (PDF, TXT, JPG)", type=["pdf", "txt", "jpg", "png"], key="gt_eval")
-        with col_ocr:
-            with st.container(border=True):
-                st.markdown("<div class='section-card-title'>:material/output: OCR Output Text File</div>", unsafe_allow_html=True)
-                ocr_file = st.file_uploader("Upload OCR output file (.txt)", type=["txt"], key="ocr_eval")
+        with st.container(border=True):
+            st.markdown("<div class='section-card-title'>:material/folder: Lokasi Folder Input</div>", unsafe_allow_html=True)
+            custom_input_dir = st.text_input(
+                "Jalur folder lokal",
+                value=DEFAULT_INPUT_DIR,
+                help="Ketik alamat folder di komputer Anda (misal: data/input)"
+            )
 
-        if gt_file and ocr_file:
-            if st.button("Calculate OCR accuracy", icon=":material/analytics:", type="primary"):
-                with tempfile.NamedTemporaryFile(suffix=os.path.splitext(gt_file.name)[1], delete=False) as f_gt:
-                    f_gt.write(gt_file.getvalue())
-                    gt_tmp = f_gt.name
+        unprocessed_files = get_unprocessed_files(input_dir=custom_input_dir)
 
-                gt_pages = load_ground_truth(gt_tmp)
-                ocr_text = ocr_file.getvalue().decode("utf-8")
+        if not os.path.exists(custom_input_dir):
+            st.error(f"Folder '{custom_input_dir}' tidak ditemukan pada sistem.", icon=":material/error:")
+        elif not unprocessed_files:
+            st.success(f"Semua berkas di dalam `{custom_input_dir}` sudah selesai diproses!", icon=":material/check_circle:")
+        else:
+            st.info(f"Ditemukan **{len(unprocessed_files)}** dokumen yang belum diproses di `{custom_input_dir}`:", icon=":material/folder_open:")
+            for f in unprocessed_files:
+                st.caption(f":material/description: `{f}`")
 
-                if gt_pages:
-                    stats = evaluate_ocr_accuracy(gt_pages, ocr_text)
+            if st.button("Jalankan pemrosesan batch", icon=":material/rocket_launch:", type="primary"):
+                progress_bar = st.progress(0)
+                status_text = st.empty()
 
-                    st.markdown("##### Accuracy summary")
-                    m1, m2, m3, m4 = st.columns(4)
-                    with m1:
-                        st.metric("CER (Character error)", f"{stats['overall_cer']*100:.2f}%", help="Character Error Rate: lower is better")
-                    with m2:
-                        st.metric("WER (Word error)", f"{stats['overall_wer']*100:.2f}%", help="Word Error Rate: lower is better")
-                    with m3:
-                        st.metric("Page mean CER", f"{stats['mean_cer']*100:.2f}%")
-                    with m4:
-                        st.metric("Overall accuracy", f"{stats['overall_accuracy']:.2f}%")
+                use_llm_flag = parsing_mode != "regex"
+                success_count = 0
 
-                    st.markdown("##### Page-by-page breakdown")
-                    df_pages = pd.DataFrame(stats["page_metrics"])
-                    st.dataframe(df_pages, width="stretch")
-                else:
-                    st.error("Could not read text from Ground Truth file.", icon=":material/error:")
+                for idx, f in enumerate(unprocessed_files):
+                    status_text.text(f"Memproses ({idx+1}/{len(unprocessed_files)}): {f}")
+                    success = process_file(f, engine=engine_choice, use_llm=use_llm_flag)
+                    if success:
+                        success_count += 1
+                    progress_bar.progress((idx + 1) / len(unprocessed_files))
 
-    else:
-        col_gt_j, col_res_j = st.columns(2, gap="medium")
-        with col_gt_j:
-            with st.container(border=True):
-                st.markdown("<div class='section-card-title'>:material/data_object: Ground Truth JSON</div>", unsafe_allow_html=True)
-                gt_json_file = st.file_uploader("Upload ground truth JSON", type=["json"], key="gt_json")
-        with col_res_j:
-            with st.container(border=True):
-                st.markdown("<div class='section-card-title'>:material/fact_check: Result JSON</div>", unsafe_allow_html=True)
-                res_json_file = st.file_uploader("Upload result JSON", type=["json"], key="res_json")
+                status_text.text("Pemrosesan batch selesai!")
+                st.toast(f"Berhasil memproses {success_count} dari {len(unprocessed_files)} berkas!", icon="🚀")
 
-        if gt_json_file and res_json_file:
-            if st.button("Calculate JSON field accuracy", icon=":material/analytics:", type="primary"):
-                with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f_gt:
-                    f_gt.write(gt_json_file.getvalue())
-                    gt_j_tmp = f_gt.name
-                with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f_res:
-                    f_res.write(res_json_file.getvalue())
-                    res_j_tmp = f_res.name
+    with adv_tab2:
+        st.markdown("##### Pengujian akurasi ekstraksi")
+        st.caption("Bandingkan hasil pembacaan teks/JSON dengan dokumen acuan asli (Ground Truth).")
 
-                report = evaluate_parsing_accuracy(gt_j_tmp, res_j_tmp)
-
-                if report:
-                    st.markdown("##### Parsing accuracy summary")
-                    c1, c2, c3, c4 = st.columns(4)
-                    with c1:
-                        st.metric("Field accuracy", f"{report['accuracy']:.2f}%")
-                    with c2:
-                        st.metric("Matched fields", report['matched_fields'])
-                    with c3:
-                        st.metric("Mismatched fields", len(report['mismatched_fields']))
-                    with c4:
-                        st.metric("Missing fields", len(report['missing_fields']))
-
-                    if report["mismatched_fields"]:
-                        st.markdown("##### Mismatched fields detail")
-                        df_mismatch = pd.DataFrame(report["mismatched_fields"])
-                        st.dataframe(df_mismatch, width="stretch")
-
-# ==============================================================================
-# TAB 4: Batch ETL Pipeline (Custom Directory Support)
-# ==============================================================================
-with tab_etl:
-    st.markdown("#### :material/rocket_launch: Batch ETL Pipeline Runner")
-    st.caption("Scan and process all documents in any target directory automatically.")
-
-    with st.container(border=True):
-        st.markdown("<div class='section-card-title'>:material/folder: Directory Configuration</div>", unsafe_allow_html=True)
-        custom_input_dir = st.text_input(
-            "Target input folder path",
-            value=DEFAULT_INPUT_DIR,
-            help="Enter any local folder path on your machine (e.g. /home/user/Documents/Scans)"
+        eval_mode = st.segmented_control(
+            "Mode evaluasi",
+            options=["ocr", "json"],
+            format_func=lambda x: "🔤 Akurasi karakter (CER/WER)" if x == "ocr" else "📦 Akurasi field JSON",
+            default="ocr",
+            label_visibility="collapsed"
         )
 
-    unprocessed_files = get_unprocessed_files(input_dir=custom_input_dir)
+        st.space("small")
 
-    if not os.path.exists(custom_input_dir):
-        st.error(f"Folder '{custom_input_dir}' not found on file system.", icon=":material/error:")
-    elif not unprocessed_files:
-        st.success(f"All files in `{custom_input_dir}` are processed and up-to-date!", icon=":material/check_circle:")
-    else:
-        st.info(f"Found **{len(unprocessed_files)}** unprocessed document(s) in `{custom_input_dir}`:", icon=":material/folder_open:")
-        for f in unprocessed_files:
-            st.caption(f":material/description: `{f}`")
+        if eval_mode == "ocr":
+            col_gt, col_ocr = st.columns(2, gap="medium")
+            with col_gt:
+                with st.container(border=True):
+                    st.markdown("<div class='section-card-title'>:material/description: Dokumen Asli (Ground Truth)</div>", unsafe_allow_html=True)
+                    gt_file = st.file_uploader("Unggah berkas dokumen acuan", type=["pdf", "txt", "jpg", "png"], key="gt_eval")
+            with col_ocr:
+                with st.container(border=True):
+                    st.markdown("<div class='section-card-title'>:material/output: Berkas Teks OCR</div>", unsafe_allow_html=True)
+                    ocr_file = st.file_uploader("Unggah berkas teks hasil OCR (.txt)", type=["txt"], key="ocr_eval")
 
-        if st.button("Run batch ETL pipeline", icon=":material/rocket_launch:", type="primary"):
-            progress_bar = st.progress(0)
-            status_text = st.empty()
+            if gt_file and ocr_file:
+                if st.button("Hitung skor akurasi OCR", icon=":material/analytics:", type="primary"):
+                    with tempfile.NamedTemporaryFile(suffix=os.path.splitext(gt_file.name)[1], delete=False) as f_gt:
+                        f_gt.write(gt_file.getvalue())
+                        gt_tmp = f_gt.name
 
-            use_llm_flag = parsing_mode != "regex"
-            success_count = 0
+                    gt_pages = load_ground_truth(gt_tmp)
+                    ocr_text = ocr_file.getvalue().decode("utf-8")
 
-            for idx, f in enumerate(unprocessed_files):
-                status_text.text(f"Processing ({idx+1}/{len(unprocessed_files)}): {f}")
-                success = process_file(f, engine=engine_choice, use_llm=use_llm_flag)
-                if success:
-                    success_count += 1
-                progress_bar.progress((idx + 1) / len(unprocessed_files))
+                    if gt_pages:
+                        stats = evaluate_ocr_accuracy(gt_pages, ocr_text)
 
-            status_text.text("Batch ETL completed!")
-            st.toast(f"Successfully processed {success_count} of {len(unprocessed_files)} files!", icon="🚀")
+                        st.markdown("##### Ringkasan akurasi")
+                        m1, m2, m3, m4 = st.columns(4)
+                        with m1:
+                            st.metric("CER (Character Error)", f"{stats['overall_cer']*100:.2f}%")
+                        with m2:
+                            st.metric("WER (Word Error)", f"{stats['overall_wer']*100:.2f}%")
+                        with m3:
+                            st.metric("Rata-rata CER halaman", f"{stats['mean_cer']*100:.2f}%")
+                        with m4:
+                            st.metric("Akurasi keseluruhan", f"{stats['overall_accuracy']:.2f}%")
 
-# ==============================================================================
-# TAB 5: Panduan Pengguna (User Guide & Safety Documentation)
-# ==============================================================================
-with tab_guide:
-    st.markdown("#### :material/menu_book: Panduan Penggunaan Aplikasi OCRMe")
-    st.caption("Panduan lengkap penggunaan fitur, pilihan AI provider, dan jaminan keamanan data.")
+                        st.markdown("##### Rincian akurasi per halaman")
+                        df_pages = pd.DataFrame(stats["page_metrics"])
+                        st.dataframe(df_pages, width="stretch")
+                    else:
+                        st.error("Gagal membaca teks dari berkas acuan Ground Truth.", icon=":material/error:")
 
-    guide_path = os.path.join(os.path.dirname(__file__), "PANDUAN_PENGGUNA.md")
-    if os.path.exists(guide_path):
-        with open(guide_path, "r", encoding="utf-8") as gf:
-            guide_md = gf.read()
-        with st.container(border=True):
-            st.markdown(guide_md)
-    else:
-        st.info("File `PANDUAN_PENGGUNA.md` tidak ditemukan.")
+        else:
+            col_gt_j, col_res_j = st.columns(2, gap="medium")
+            with col_gt_j:
+                with st.container(border=True):
+                    st.markdown("<div class='section-card-title'>:material/data_object: JSON Acuan (Ground Truth)</div>", unsafe_allow_html=True)
+                    gt_json_file = st.file_uploader("Unggah JSON acuan", type=["json"], key="gt_json")
+            with col_res_j:
+                with st.container(border=True):
+                    st.markdown("<div class='section-card-title'>:material/fact_check: JSON Hasil Extraction</div>", unsafe_allow_html=True)
+                    res_json_file = st.file_uploader("Unggah JSON hasil", type=["json"], key="res_json")
+
+            if gt_json_file and res_json_file:
+                if st.button("Hitung kecocokan field JSON", icon=":material/analytics:", type="primary"):
+                    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f_gt:
+                        f_gt.write(gt_json_file.getvalue())
+                        gt_j_tmp = f_gt.name
+                    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f_res:
+                        f_res.write(res_json_file.getvalue())
+                        res_j_tmp = f_res.name
+
+                    report = evaluate_parsing_accuracy(gt_j_tmp, res_j_tmp)
+
+                    if report:
+                        st.markdown("##### Ringkasan akurasi JSON")
+                        c1, c2, c3, c4 = st.columns(4)
+                        with c1:
+                            st.metric("Akurasi field", f"{report['accuracy']:.2f}%")
+                        with c2:
+                            st.metric("Field cocok", report['matched_fields'])
+                        with c3:
+                            st.metric("Field tidak cocok", len(report['mismatched_fields']))
+                        with c4:
+                            st.metric("Field hilang", len(report['missing_fields']))
+
+                        if report["mismatched_fields"]:
+                            st.markdown("##### Rincian field tidak cocok")
+                            df_mismatch = pd.DataFrame(report["mismatched_fields"])
+                            st.dataframe(df_mismatch, width="stretch")
