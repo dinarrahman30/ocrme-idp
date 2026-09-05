@@ -467,9 +467,9 @@ function renderResults(res, uploadedFile = null) {
   const elMethod = document.getElementById('res-method');
   const elEngine = document.getElementById('res-engine');
 
-  if (elType) elType.textContent = `${res.metadata.doc_subtype}`;
-  if (elConf) elConf.textContent = `${(res.metadata.confidence * 100).toFixed(1)}%`;
-  if (elMethod) elMethod.textContent = res.metadata.parsing_method;
+  if (elType) elType.textContent = `${res.metadata.doc_subtype || res.metadata.doc_type}`;
+  if (elConf) elConf.textContent = `${((res.metadata.confidence || 0.95) * 100).toFixed(1)}%`;
+  if (elMethod) elMethod.textContent = res.metadata.parsing_method || "AUTO (LLM)";
   if (elEngine) elEngine.textContent = `${(res.metadata.ocr_engine || 'easyocr').toUpperCase()} • 1.2s`;
 
   // Render Visual Document Preview
@@ -481,13 +481,13 @@ function renderResults(res, uploadedFile = null) {
   // Raw Text Output
   document.getElementById('raw-text-output').textContent = res.raw_text || "// No raw text available";
 
-  // Table Line Items Output
+  // Table Line Items / Extracted Fields Output
   const tbody = document.getElementById('table-items-body');
   if (tbody) {
     tbody.innerHTML = '';
-    const transactions = res.data.transactions || (Array.isArray(res.data) ? res.data : null);
+    const transactions = res.data ? res.data.transactions : null;
 
-    if (transactions && transactions.length > 0) {
+    if (Array.isArray(transactions) && transactions.length > 0) {
       transactions.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -498,8 +498,24 @@ function renderResults(res, uploadedFile = null) {
         `;
         tbody.appendChild(tr);
       });
-    } else {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No nested transaction items found for this document category</td></tr>`;
+    } else if (res.data && typeof res.data === 'object') {
+      // Render Key-Value pairs for documents without itemized transactions (KTP, Certificate, Key-Values)
+      Object.entries(res.data).forEach(([key, val]) => {
+        if (typeof val !== 'object' && val !== null) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="font-weight: 600; color: #60a5fa;">${key.replace(/_/g, ' ').toUpperCase()}</td>
+            <td>1</td>
+            <td>-</td>
+            <td style="font-weight: 600; color: #34d399;">${val}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    if (tbody.children.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Tidak ada baris data atau tabel yang terurai untuk dokumen ini</td></tr>`;
     }
   }
 }
@@ -784,26 +800,39 @@ function renderDocumentPreview(res, uploadedFile = null) {
 
 // Download & Export Handler
 function exportData(format) {
+  if (!currentResult) {
+    alert("Belum ada data ekstraksi untuk diekspor.");
+    return;
+  }
   if (format === 'json') {
     const blob = new Blob([JSON.stringify(currentResult, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `OCRMe_Export_${currentResult.metadata.doc_type}.json`;
+    a.download = `OCRMe_Export_${currentResult.metadata.doc_type || 'result'}.json`;
     a.click();
   } else if (format === 'csv') {
-    const transactions = currentResult.data.transactions || [];
-    if (transactions.length === 0) {
-      alert("Tidak ada data tabel transaksi untuk diekspor ke CSV.");
+    let csvContent = "";
+    const transactions = currentResult.data ? currentResult.data.transactions : null;
+    if (Array.isArray(transactions) && transactions.length > 0) {
+      const headers = Object.keys(transactions[0]).join(',');
+      const rows = transactions.map(row => Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+      csvContent = [headers, ...rows].join('\n');
+    } else if (currentResult.data && typeof currentResult.data === 'object') {
+      const headers = "Field,Value";
+      const rows = Object.entries(currentResult.data)
+        .filter(([k, v]) => typeof v !== 'object' && v !== null)
+        .map(([k, v]) => `"${k}","${String(v).replace(/"/g, '""')}"`);
+      csvContent = [headers, ...rows].join('\n');
+    } else {
+      alert("Tidak ada data untuk diekspor ke CSV.");
       return;
     }
-    const headers = Object.keys(transactions[0]).join(',');
-    const rows = transactions.map(row => Object.values(row).join(','));
-    const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = encodedUri;
-    a.download = `OCRMe_Export_${currentResult.metadata.doc_type}.csv`;
+    a.href = url;
+    a.download = `OCRMe_Export_${currentResult.metadata.doc_type || 'result'}.csv`;
     a.click();
   }
 }
