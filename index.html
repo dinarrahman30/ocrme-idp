@@ -124,30 +124,63 @@
           </div>
 
           <!-- Document Classification Info -->
-          <div id="classification-info" style="display: flex; gap: 1rem; margin-bottom: 1rem; padding: 1rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); border: 1px solid var(--bg-card-border);">
+          <div id="classification-info" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; padding: 1.1rem; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(20, 29, 47, 0.7) 0%, rgba(11, 16, 26, 0.9) 100%); border: 1px solid var(--bg-card-border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);">
             <div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Detected Category</div>
-              <div id="res-doc-type" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">-</div>
+              <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+                <i data-lucide="file-text" style="width: 14px; height: 14px; color: #60a5fa;"></i> Category
+              </div>
+              <div id="res-doc-type" class="info-pill info-pill-blue">-</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Confidence Score</div>
-              <div id="res-confidence" style="font-weight: 600; font-size: 0.95rem; color: var(--text-secondary);">-</div>
+              <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #34d399;"></i> Confidence
+              </div>
+              <div id="res-confidence" class="info-pill info-pill-green">-</div>
             </div>
             <div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Method</div>
-              <div id="res-method" style="font-weight: 600; font-size: 0.95rem; color: var(--text-secondary);">-</div>
+              <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+                <i data-lucide="cpu" style="width: 14px; height: 14px; color: #c084fc;"></i> Method
+              </div>
+              <div id="res-method" class="info-pill info-pill-purple">-</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+                <i data-lucide="zap" style="width: 14px; height: 14px; color: #fbbf24;"></i> Engine & Speed
+              </div>
+              <div id="res-engine" class="info-pill info-pill-amber">-</div>
             </div>
           </div>
 
-          <!-- Tabs for Structured JSON / Line Items / Raw Text -->
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 0.5rem;">
-            <button class="btn btn-secondary" id="btn-view-json" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Structured JSON</button>
-            <button class="btn btn-secondary" id="btn-view-csv" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Line Items Table</button>
-            <button class="btn btn-secondary" id="btn-view-raw" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Raw Text</button>
+          <!-- Tabs for Document Preview / Structured JSON / Line Items / Raw Text -->
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 0.5rem; flex-wrap: wrap;">
+            <button class="view-btn-tab active" id="btn-view-preview">
+              <i data-lucide="eye" style="width: 15px; height: 15px;"></i> Document Preview
+            </button>
+            <button class="view-btn-tab" id="btn-view-json">
+              <i data-lucide="code-2" style="width: 15px; height: 15px;"></i> Structured JSON
+            </button>
+            <button class="view-btn-tab" id="btn-view-csv">
+              <i data-lucide="table-2" style="width: 15px; height: 15px;"></i> Line Items Table
+            </button>
+            <button class="view-btn-tab" id="btn-view-raw">
+              <i data-lucide="file-type" style="width: 15px; height: 15px;"></i> Raw Text
+            </button>
           </div>
 
           <!-- Output Content Area -->
-          <div id="view-container-json">
+          <div id="view-container-preview">
+            <div id="preview-display-box" class="doc-preview-card" style="min-height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+              <div style="background: rgba(59, 130, 246, 0.1); border-radius: 50%; padding: 1.25rem; margin-bottom: 1rem; color: #60a5fa;">
+                <i data-lucide="file-search" style="width: 36px; height: 36px;"></i>
+              </div>
+              <h4 style="font-weight: 600; font-size: 1.05rem; margin-bottom: 0.4rem; color: var(--text-primary);">Belum Ada Dokumen Yang Dipilih</h4>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 420px;">
+                Silakan unggah file di kolom sebelah kiri atau klik sampel dokumen (<em>Invoice</em>, <em>KTP</em>, <em>Bank Statement</em>) untuk menampilkan pratinjau visual &amp; hasil ekstraksi OCR.
+              </p>
+            </div>
+          </div>
+
+          <div id="view-container-json" style="display: none;">
             <pre class="code-block" id="json-output">// Click "Process & Extract Document" or select a sample above...</pre>
           </div>
 

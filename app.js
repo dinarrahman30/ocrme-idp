@@ -149,7 +149,10 @@ function initDragAndDrop() {
   });
 }
 
+let currentUploadedFile = null;
+
 function handleFileSelected(file) {
+  currentUploadedFile = file;
   const dropZone = document.getElementById('drop-zone');
   dropZone.innerHTML = `
     <div class="drop-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
@@ -161,38 +164,38 @@ function handleFileSelected(file) {
   if (window.lucide) lucide.createIcons();
 }
 
-// Result View Switcher (JSON / CSV / Raw)
+// Result View Switcher (Preview / JSON / CSV / Raw)
 function initViewSwitcher() {
+  const btnPreview = document.getElementById('btn-view-preview');
   const btnJson = document.getElementById('btn-view-json');
   const btnCsv = document.getElementById('btn-view-csv');
   const btnRaw = document.getElementById('btn-view-raw');
 
+  const containerPreview = document.getElementById('view-container-preview');
   const containerJson = document.getElementById('view-container-json');
   const containerCsv = document.getElementById('view-container-csv');
   const containerRaw = document.getElementById('view-container-raw');
 
-  btnJson.addEventListener('click', () => {
-    containerJson.style.display = 'block';
-    containerCsv.style.display = 'none';
-    containerRaw.style.display = 'none';
-  });
+  const allBtns = [btnPreview, btnJson, btnCsv, btnRaw];
+  const allContainers = [containerPreview, containerJson, containerCsv, containerRaw];
 
-  btnCsv.addEventListener('click', () => {
-    containerJson.style.display = 'none';
-    containerCsv.style.display = 'block';
-    containerRaw.style.display = 'none';
-  });
+  function setActiveTab(activeBtn, activeContainer) {
+    allBtns.forEach(b => { if(b) b.classList.remove('active'); });
+    allContainers.forEach(c => { if(c) c.style.display = 'none'; });
+    if(activeBtn) activeBtn.classList.add('active');
+    if(activeContainer) activeContainer.style.display = 'block';
+  }
 
-  btnRaw.addEventListener('click', () => {
-    containerJson.style.display = 'none';
-    containerCsv.style.display = 'none';
-    containerRaw.style.display = 'block';
-  });
+  if (btnPreview) btnPreview.addEventListener('click', () => setActiveTab(btnPreview, containerPreview));
+  if (btnJson) btnJson.addEventListener('click', () => setActiveTab(btnJson, containerJson));
+  if (btnCsv) btnCsv.addEventListener('click', () => setActiveTab(btnCsv, containerCsv));
+  if (btnRaw) btnRaw.addEventListener('click', () => setActiveTab(btnRaw, containerRaw));
 }
 
 // Sample Loader
 function loadSample(type) {
   if (SAMPLE_DATA[type]) {
+    currentUploadedFile = null;
     currentResult = SAMPLE_DATA[type];
     renderResults(currentResult);
   }
@@ -214,15 +217,25 @@ function handleProcessDocument() {
     statusBadge.innerHTML = `Success`;
     statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
     statusBadge.style.color = '#34d399';
-    renderResults(currentResult);
+    renderResults(currentResult, currentUploadedFile);
   }, 1000);
 }
 
-// Render Results to UI
-function renderResults(res) {
-  document.getElementById('res-doc-type').textContent = `${res.metadata.doc_subtype} (${res.metadata.doc_type})`;
-  document.getElementById('res-confidence').textContent = `${(res.metadata.confidence * 100).toFixed(1)}%`;
-  document.getElementById('res-method').textContent = res.metadata.parsing_method;
+// Render Results & Document Preview to UI
+function renderResults(res, uploadedFile = null) {
+  // Update colorful info pills
+  const elType = document.getElementById('res-doc-type');
+  const elConf = document.getElementById('res-confidence');
+  const elMethod = document.getElementById('res-method');
+  const elEngine = document.getElementById('res-engine');
+
+  if (elType) elType.textContent = `${res.metadata.doc_subtype}`;
+  if (elConf) elConf.textContent = `${(res.metadata.confidence * 100).toFixed(1)}%`;
+  if (elMethod) elMethod.textContent = res.metadata.parsing_method;
+  if (elEngine) elEngine.textContent = `${(res.metadata.ocr_engine || 'easyocr').toUpperCase()} • 1.2s`;
+
+  // Render Visual Document Preview
+  renderDocumentPreview(res, uploadedFile);
 
   // JSON Output
   document.getElementById('json-output').textContent = JSON.stringify(res, null, 2);
@@ -232,24 +245,207 @@ function renderResults(res) {
 
   // Table Line Items Output
   const tbody = document.getElementById('table-items-body');
-  tbody.innerHTML = '';
+  if (tbody) {
+    tbody.innerHTML = '';
+    const transactions = res.data.transactions || (Array.isArray(res.data) ? res.data : null);
 
-  const transactions = res.data.transactions || (Array.isArray(res.data) ? res.data : null);
-
-  if (transactions && transactions.length > 0) {
-    transactions.forEach(item => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${item.item || item.description || '-'}</td>
-        <td>${item.qty || 1}</td>
-        <td>Rp ${Number(item.price || item.amount || 0).toLocaleString()}</td>
-        <td>Rp ${Number(item.total || item.amount || 0).toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } else {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No nested transaction items found for this document category</td></tr>`;
+    if (transactions && transactions.length > 0) {
+      transactions.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.item || item.description || '-'}</td>
+          <td>${item.qty || 1}</td>
+          <td>Rp ${Number(item.price || item.amount || 0).toLocaleString()}</td>
+          <td>Rp ${Number(item.total || item.amount || 0).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No nested transaction items found for this document category</td></tr>`;
+    }
   }
+}
+
+// Render Interactive Document Preview Card
+function renderDocumentPreview(res, uploadedFile = null) {
+  const box = document.getElementById('preview-display-box');
+  if (!box) return;
+
+  if (uploadedFile && uploadedFile.type && uploadedFile.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      box.innerHTML = `
+        <div style="width: 100%; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div style="font-size: 0.85rem; font-weight: 600; color: #60a5fa; display: flex; align-items: center; gap: 0.4rem;">
+              <i data-lucide="image" style="width: 16px; height: 16px;"></i> User Document Image Preview
+            </div>
+            <span style="font-size: 0.75rem; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3);">
+              <i data-lucide="scan" style="width: 12px; height: 12px;"></i> OCR Bounding Layer Active
+            </span>
+          </div>
+          <div style="position: relative; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--bg-card-border); max-height: 380px; display: flex; justify-content: center; background: #000; padding: 0.5rem;">
+            <img src="${e.target.result}" style="max-height: 360px; max-width: 100%; object-fit: contain;" alt="Uploaded Document Preview">
+          </div>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    };
+    reader.readAsDataURL(uploadedFile);
+    return;
+  }
+
+  const docType = res ? res.metadata.doc_type : 'invoice';
+
+  if (docType === 'invoice') {
+    box.innerHTML = `
+      <div style="width: 100%; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+          <span style="font-size: 0.8rem; font-weight: 600; color: #60a5fa; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Visual Document Preview &amp; OCR Box Highlights
+          </span>
+          <span style="font-size: 0.75rem; background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.3);">
+            PDF Invoice Document
+          </span>
+        </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 1.25rem; font-family: var(--font-sans);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+            <div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: #fff;">PT SOLUSI DATA NUSANTARA</div>
+              <div style="font-size: 0.78rem; color: #94a3b8;">Layanan Software &amp; IDP Enterprise</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="ocr-highlight-box" style="font-size: 0.85rem; font-weight: 700; color: #34d399;">
+                ${res.data.invoice_number}
+              </span>
+              <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.2rem;">Tanggal: ${res.data.date}</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 0.82rem;">
+            <div>
+              <span style="color: #94a3b8;">Kepada Yth:</span>
+              <div style="font-weight: 600; color: #f3f4f6; margin-top: 0.2rem;">${res.data.customer}</div>
+            </div>
+            <div>
+              <span style="color: #94a3b8;">Jatuh Tempo:</span>
+              <div style="font-weight: 600; color: #f59e0b; margin-top: 0.2rem;">${res.data.due_date}</div>
+            </div>
+          </div>
+          <table style="width: 100%; font-size: 0.8rem; margin-bottom: 1rem;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8;">
+                <th style="padding: 0.4rem 0;">Deskripsi Item</th>
+                <th style="padding: 0.4rem 0; text-align: center;">Qty</th>
+                <th style="padding: 0.4rem 0; text-align: right;">Harga (Rp)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(res.data.transactions || []).map(t => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                  <td style="padding: 0.4rem 0; color: #e2e8f0;">${t.item}</td>
+                  <td style="padding: 0.4rem 0; text-align: center; color: #94a3b8;">${t.qty}</td>
+                  <td style="padding: 0.4rem 0; text-align: right; color: #34d399; font-weight: 600;">${t.total.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="text-align: right; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.8rem;">
+            <span style="font-size: 0.85rem; color: #94a3b8;">Total Tagihan: </span>
+            <span class="ocr-highlight-box" style="font-size: 1.05rem; font-weight: 700; color: #34d399; margin-left: 0.5rem;">
+              Rp ${res.data.total_amount.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (docType === 'identity_card') {
+    box.innerHTML = `
+      <div style="width: 100%; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+          <span style="font-size: 0.8rem; font-weight: 600; color: #34d399; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i> Visual KTP Indonesia Preview &amp; OCR Box
+          </span>
+          <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            Kartu Tanda Penduduk
+          </span>
+        </div>
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1.5px solid #3b82f6; border-radius: 12px; padding: 1.25rem; color: #fff; position: relative;">
+          <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; letter-spacing: 1px;">PROVINSI DKI JAKARTA</div>
+            <div style="font-size: 0.75rem; font-weight: 600; color: #94a3b8;">JAKARTA PUSAT</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 1rem;">
+            <div style="font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.35rem;">
+              <div>
+                <span style="color: #94a3b8;">NIK : </span>
+                <span class="ocr-highlight-box" style="font-weight: 700; color: #60a5fa;">${res.data.nik}</span>
+              </div>
+              <div><span style="color: #94a3b8;">Nama : </span><strong style="color: #fff;">${res.data.nama}</strong></div>
+              <div><span style="color: #94a3b8;">Tempat/Tgl Lahir : </span>${res.data.tempat_lahir}, ${res.data.tanggal_lahir}</div>
+              <div><span style="color: #94a3b8;">Alamat : </span>${res.data.alamat}</div>
+              <div><span style="color: #94a3b8;">Pekerjaan : </span><span style="color: #34d399;">${res.data.pekerjaan}</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem;">
+              <i data-lucide="user" style="width: 44px; height: 44px; color: #64748b;"></i>
+              <span style="font-size: 0.65rem; color: #94a3b8; margin-top: 0.4rem;">PAS FOTO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (docType === 'bank_statement') {
+    box.innerHTML = `
+      <div style="width: 100%; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+          <span style="font-size: 0.8rem; font-weight: 600; color: #c084fc; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="landmark" style="width: 16px; height: 16px;"></i> Visual Rekening Koran Preview &amp; OCR Box
+          </span>
+          <span style="font-size: 0.75rem; background: rgba(139, 92, 246, 0.15); color: #c084fc; padding: 0.2rem 0.6rem; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.3);">
+            Bank Statement (BCA)
+          </span>
+        </div>
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 1.25rem; font-family: var(--font-sans);">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+            <div>
+              <div style="font-size: 1rem; font-weight: 700; color: #60a5fa;">REKENING KORAN BANK BCA</div>
+              <div style="font-size: 0.78rem; color: #94a3b8;">Nasabah: ${res.data.account_holder}</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="ocr-highlight-box" style="font-size: 0.85rem; font-weight: 700; color: #c084fc;">
+                No Rek: ${res.data.account_number}
+              </span>
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem;">Periode: ${res.data.period}</div>
+            </div>
+          </div>
+          <table style="width: 100%; font-size: 0.78rem; margin-bottom: 1rem;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8;">
+                <th style="padding: 0.4rem 0;">Tgl</th>
+                <th style="padding: 0.4rem 0;">Keterangan Transaksi</th>
+                <th style="padding: 0.4rem 0; text-align: right;">Nominal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(res.data.transactions || []).map(t => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                  <td style="padding: 0.4rem 0; color: #94a3b8;">${t.date}</td>
+                  <td style="padding: 0.4rem 0; color: #e2e8f0;">${t.item}</td>
+                  <td style="padding: 0.4rem 0; text-align: right; font-weight: 600; color: ${t.type === 'CR' ? '#34d399' : '#f87171'};">
+                    ${t.type === 'CR' ? '+' : '-'} Rp ${t.amount.toLocaleString()}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.75rem; font-size: 0.82rem;">
+            <div><span style="color: #94a3b8;">Saldo Awal: </span><strong>Rp ${res.data.opening_balance.toLocaleString()}</strong></div>
+            <div><span style="color: #94a3b8;">Saldo Akhir: </span><span class="ocr-highlight-box" style="font-weight: 700; color: #34d399;">Rp ${res.data.closing_balance.toLocaleString()}</span></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  if (window.lucide) lucide.createIcons();
 }
 
 // Download & Export Handler

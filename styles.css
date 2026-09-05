@@ -433,3 +433,104 @@ footer {
   border-top: 1px solid var(--bg-card-border);
   margin-top: 4rem;
 }
+
+/* ==========================================================================
+   Colorful Classification Info Pills & Document Preview System
+   ========================================================================== */
+.info-pill {
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-fast);
+}
+
+.info-pill-blue {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.3));
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+
+.info-pill-green {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3));
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.info-pill-purple {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.3));
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #c084fc;
+}
+
+.info-pill-amber {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.3));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+/* View Switcher Active Tab Glow */
+.view-btn-tab {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bg-card-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all var(--transition-fast);
+}
+
+.view-btn-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.view-btn-tab.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+/* Document Preview Component Styling */
+.doc-preview-card {
+  background: #090d16;
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.ocr-highlight-box {
+  position: relative;
+  border: 1.5px dashed rgba(52, 211, 153, 0.7);
+  background: rgba(16, 185, 129, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  display: inline-block;
+}
+
+.ocr-highlight-box::after {
+  content: 'OCR Data';
+  position: absolute;
+  top: -10px;
+  right: 4px;
+  background: #10b981;
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
