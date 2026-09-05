@@ -229,4 +229,4 @@ python3 ocr_eval.py
 
 - **Dinar Wahyu Rahman**
 - **Email**: [dinarrahman30@gmail.com](mailto:dinarrahman30@gmail.com)
-- **GitHub**: [dinarrahmann](https://github.com/dinarrahmann)
+- **Linkedin**: [Dinar W. Rahman](https://www.linkedin.com/in/dinar-wahyu-rahman)
