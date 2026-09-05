@@ -2,7 +2,11 @@
 
 An enterprise-grade **Intelligent Document Processing (IDP)** system and multi-source ETL pipeline designed to automate text extraction, document classification, and structured data parsing from any document stack—including invoices, receipts, tax forms, identity cards (KTP), bank statements, Microsoft Office documents (`.docx`, `.xlsx`, `.pptx`), PDFs, images, and plain text/JSON files.
 
-> 🇮🇩 **Panduan Bahasa Indonesia**: Untuk panduan penggunaan aplikasi web bagi pengguna awam, silakan baca [PANDUAN_PENGGUNA.md](file:///home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/PANDUAN_PENGGUNA.md).
+> 🌐 **Live Demo & Public Deployments**:
+> - 🚀 **Streamlit Cloud App (Python AI/Deep Learning Backend)**: [https://ocrme-idp.streamlit.app/](https://ocrme-idp.streamlit.app/)
+> - ⚡ **Vercel Web Studio (Client-Side Web Edition)**: [https://ocrme-idp.vercel.app/](https://ocrme-idp.vercel.app/)
+>
+> 🇮🇩 **Panduan Bahasa Indonesia**: Untuk panduan penggunaan aplikasi web bagi pengguna awam, silakan baca [PANDUAN_PENGGUNA.md](PANDUAN_PENGGUNA.md).
 
 ---
 

@@ -15,7 +15,11 @@ Aplikasi ini dirancang untuk membaca, mengekstrak, dan mengubah berbagai jenis d
 
 ## 🚀 Langkah Cepat Membuka Aplikasi
 
-### Cara 1: Menjalankan Langsung (Python Local)
+### Cara 1: Akses Langsung Online (Public Web App)
+- 🚀 **Streamlit Cloud App (Fitur Lengkap AI & Python Deep Learning)**: [https://ocrme-idp.streamlit.app/](https://ocrme-idp.streamlit.app/)
+- ⚡ **Vercel Web Studio (Versi Web Cepat Client-Side)**: [https://ocrme-idp.vercel.app/](https://ocrme-idp.vercel.app/)
+
+### Cara 2: Menjalankan Langsung di Komputer (Python Local)
 1. Buka terminal atau command prompt pada komputer Anda.
 2. Jalankan perintah berikut:
    ```bash
