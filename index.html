@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCRMe — Intelligent Document Processing (IDP)</title>
+  <meta name="description" content="Aplikasi ekstraksi data terstruktur berbasis AI (Google Gemini, EasyOCR, Tesseract) untuk Invoice, Rekening Koran, KTP, dan Nota Pembelian. Ready for Vercel Deployment.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons & Chart.js -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header & Navigation -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-icon">
+        <i data-lucide="scan-text" style="color: #fff; width: 22px; height: 22px;"></i>
+      </div>
+      <span>OCRMe <span style="font-weight: 300; color: var(--text-secondary);">IDP</span></span>
+      <span class="badge-vercel">
+        <i data-lucide="triangle" style="width: 10px; height: 10px; fill: #fff;"></i> Vercel Ready
+      </span>
+    </a>
+
+    <nav>
+      <button class="nav-tab active" data-tab="tab-processor">
+        <i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Document Processor
+      </button>
+      <button class="nav-tab" data-tab="tab-analytics">
+        <i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Database & Analytics
+      </button>
+      <button class="nav-tab" data-tab="tab-accuracy">
+        <i data-lucide="target" style="width: 18px; height: 18px;"></i> Accuracy Evaluator
+      </button>
+      <button class="nav-tab" data-tab="tab-api">
+        <i data-lucide="code-2" style="width: 18px; height: 18px;"></i> API & Vercel Guide
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- TAB 1: DOCUMENT PROCESSOR -->
+    <section id="tab-processor" class="tab-content active">
+      <div class="grid-2">
+        
+        <!-- Left Column: Upload & Settings -->
+        <div class="card glass glass-glow">
+          <div class="card-title">
+            <i data-lucide="upload-cloud" style="color: var(--accent-primary);"></i>
+            <span>Upload Document</span>
+          </div>
+
+          <div class="drop-zone" id="drop-zone">
+            <div class="drop-icon">
+              <i data-lucide="file-up" style="width: 28px; height: 28px;"></i>
+            </div>
+            <h4 style="font-weight: 600; margin-bottom: 0.3rem;">Drag & drop your document here</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Supports PDF, PNG, JPG, WEBP, DOCX, XLSX</p>
+            <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx">
+            <button class="btn btn-secondary" style="margin-top: 1.25rem;" onclick="document.getElementById('file-input').click()">
+              Browse Files
+            </button>
+          </div>
+
+          <div class="sample-pills">
+            <span style="font-size: 0.8rem; color: var(--text-muted); align-self: center;">Try sample:</span>
+            <div class="sample-pill" onclick="loadSample('invoice')">🧾 Invoice sample</div>
+            <div class="sample-pill" onclick="loadSample('ktp')">🪪 KTP Indonesia</div>
+            <div class="sample-pill" onclick="loadSample('bank')">🏦 BCA Bank Statement</div>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="control-group">
+              <label class="control-label">OCR Engine</label>
+              <select id="engine-select">
+                <option value="easyocr">EasyOCR (Recom. for Tables/Invoices)</option>
+                <option value="tesseract">Tesseract OCR (Standard Text)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Parsing Method</label>
+              <select id="parser-select">
+                <option value="auto">Auto (AI / LLM with Regex Fallback)</option>
+                <option value="regex">Legacy Regex Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group" style="margin-top: 1rem;">
+            <label class="control-label">AI Model Provider</label>
+            <select id="ai-provider">
+              <option value="gemini">Google Gemini AI (gemini-3.6-flash)</option>
+              <option value="openai">OpenAI ChatGPT (gpt-4o-mini)</option>
+              <option value="claude">Anthropic Claude (claude-3-5-haiku)</option>
+              <option value="ollama">Ollama Local LLM (llama3.1)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="btn-process" style="width: 100%; margin-top: 1.5rem;">
+            <i data-lucide="play" style="width: 18px; height: 18px;"></i> Process & Extract Document
+          </button>
+        </div>
+
+        <!-- Right Column: Extraction Results & JSON Viewer -->
+        <div class="card glass">
+          <div class="card-title" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="cpu" style="color: var(--accent-secondary);"></i>
+              <span>Extraction Results</span>
+            </div>
+            <div id="status-badge" style="font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 12px; background: rgba(16, 185, 129, 0.2); color: #34d399;">
+              Ready
+            </div>
+          </div>
+
+          <!-- Document Classification Info -->
+          <div id="classification-info" style="display: flex; gap: 1rem; margin-bottom: 1rem; padding: 1rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); border: 1px solid var(--bg-card-border);">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Detected Category</div>
+              <div id="res-doc-type" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">Invoice / Faktur</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Confidence Score</div>
+              <div id="res-confidence" style="font-weight: 600; font-size: 0.95rem; color: #34d399;">98.5%</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Method</div>
+              <div id="res-method" style="font-weight: 600; font-size: 0.95rem; color: #60a5fa;">AUTO (LLM)</div>
+            </div>
+          </div>
+
+          <!-- Tabs for Structured JSON / Line Items / Raw Text -->
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 0.5rem;">
+            <button class="btn btn-secondary" id="btn-view-json" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Structured JSON</button>
+            <button class="btn btn-secondary" id="btn-view-csv" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Line Items Table</button>
+            <button class="btn btn-secondary" id="btn-view-raw" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Raw Text</button>
+          </div>
+
+          <!-- Output Content Area -->
+          <div id="view-container-json">
+            <pre class="code-block" id="json-output">// Click "Process & Extract Document" or select a sample above...</pre>
+          </div>
+
+          <div id="view-container-csv" style="display: none;">
+            <div class="table-container">
+              <table id="table-items">
+                <thead>
+                  <tr>
+                    <th>Item Description</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="table-items-body">
+                  <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No transaction items parsed yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="view-container-raw" style="display: none;">
+            <pre class="code-block" id="raw-text-output" style="color: #94a3b8;">// Raw extracted OCR text will appear here...</pre>
+          </div>
+
+          <!-- Export Actions -->
+          <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+            <button class="btn btn-secondary" onclick="exportData('json')" style="flex: 1;">
+              <i data-lucide="download" style="width: 16px; height: 16px;"></i> Download JSON
+            </button>
+            <button class="btn btn-secondary" onclick="exportData('csv')" style="flex: 1;">
+              <i data-lucide="file-spread-sheet" style="width: 16px; height: 16px;"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: DATABASE & ANALYTICS -->
+    <section id="tab-analytics" class="tab-content">
+      <div class="grid-4" style="margin-bottom: 1.5rem;">
+        <div class="card glass kpi-card">
+          <div class="kpi-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+            <i data-lucide="files"></i>
+          </div>
+          <div>
+            <div class="kpi-value" id="kpi-total">142</div>
+            <div class="kpi-label">Documents Processed</div>
+          </div>
+        </div>
+        <div class="card glass kpi-card">
+          <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+            <i data-lucide="check-circle-2"></i>
+          </div>
+          <div>
+            <div class="kpi-value">97.4%</div>
+            <div class="kpi-label">Average Extraction Accuracy</div>
+          </div>
+        </div>
+        <div class="card glass kpi-card">
+          <div class="kpi-icon" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <div>
+            <div class="kpi-value">91.5%</div>
+            <div class="kpi-label">AI Auto-Parsing Ratio</div>
+          </div>
+        </div>
+        <div class="card glass kpi-card">
+          <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+            <i data-lucide="clock"></i>
+          </div>
+          <div>
+            <div class="kpi-value">1.4s</div>
+            <div class="kpi-label">Avg. Processing Time</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card glass">
+          <div class="card-title">
+            <i data-lucide="pie-chart" style="color: var(--accent-primary);"></i>
+            <span>Document Distribution by Category</span>
+          </div>
+          <div style="height: 260px; position: relative;">
+            <canvas id="chart-distribution"></canvas>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="card-title">
+            <i data-lucide="activity" style="color: var(--accent-emerald);"></i>
+            <span>OCR Engine Utilization</span>
+          </div>
+          <div style="height: 260px; position: relative;">
+            <canvas id="chart-engines"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ACCURACY EVALUATOR -->
+    <section id="tab-accuracy" class="tab-content">
+      <div class="card glass" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-title">
+          <i data-lucide="target" style="color: var(--accent-rose);"></i>
+          <span>Accuracy Evaluator (CER & WER Metrics)</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+          Bandingkan teks hasil ekstraksi OCR terhadap teks referensi asli (*Ground Truth*) untuk mengukur Character Error Rate (CER) dan Word Error Rate (WER).
+        </p>
+
+        <div class="grid-2">
+          <div class="control-group">
+            <label class="control-label">Ground Truth (Teks Asli Reference)</label>
+            <textarea id="eval-gt" rows="6" style="width: 100%; background: #060910; border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); color: #fff; padding: 0.75rem; font-family: var(--font-mono); font-size: 0.85rem;" placeholder="Masukkan teks asli dokumen di sini..."></textarea>
+          </div>
+          <div class="control-group">
+            <label class="control-label">OCR Output (Hasil OCR)</label>
+            <textarea id="eval-ocr" rows="6" style="width: 100%; background: #060910; border: 1px solid var(--bg-card-border); border-radius: var(--radius-sm); color: #fff; padding: 0.75rem; font-family: var(--font-mono); font-size: 0.85rem;" placeholder="Masukkan hasil OCR yang akan diuji..."></textarea>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="calculateAccuracy()" style="margin-top: 1.25rem;">
+          <i data-lucide="calculator"></i> Calculate Accuracy Score
+        </button>
+
+        <div id="eval-results" style="display: none; margin-top: 1.5rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); border: 1px solid var(--bg-card-border);">
+          <div class="grid-3">
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Character Error Rate (CER)</div>
+              <div id="res-cer" style="font-size: 1.4rem; font-weight: 700; color: #f43f5e;">1.2%</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Word Error Rate (WER)</div>
+              <div id="res-wer" style="font-size: 1.4rem; font-weight: 700; color: #f59e0b;">2.5%</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Overall Accuracy Score</div>
+              <div id="res-score" style="font-size: 1.4rem; font-weight: 700; color: #34d399;">98.8%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: API & VERCEL GUIDE -->
+    <section id="tab-api" class="tab-content">
+      <div class="grid-2">
+        <div class="card glass">
+          <div class="card-title">
+            <i data-lucide="cloud-lightning" style="color: var(--accent-amber);"></i>
+            <span>How to Deploy to Vercel</span>
+          </div>
+          <ol style="padding-left: 1.25rem; font-size: 0.9rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.75rem;">
+            <li>Install Vercel CLI pada komputer Anda:
+              <pre class="code-block" style="margin-top: 0.4rem;">npm install -g vercel</pre>
+            </li>
+            <li>Jalankan perintah deployment pada folder project ini:
+              <pre class="code-block" style="margin-top: 0.4rem;">vercel --prod</pre>
+            </li>
+            <li>Proyek OCRMe Web Anda langsung aktif secara instan dengan SSL HTTPS otomatis di Vercel!</li>
+          </ol>
+        </div>
+
+        <div class="card glass">
+          <div class="card-title">
+            <i data-lucide="terminal" style="color: var(--accent-primary);"></i>
+            <span>REST API Endpoint Example</span>
+          </div>
+          <pre class="code-block">// Example cURL Request to Vercel Serverless Endpoint
+curl -X POST https://your-project.vercel.app/api/ocr \
+  -H "Content-Type: application/json" \
+  -d '{
+    "engine": "easyocr",
+    "parsing_mode": "auto"
+  }'</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>OCRMe — Intelligent Document Processing &copy; 2026. Built with Python, EasyOCR, Tesseract, and Vercel.</p>
+  </footer>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>

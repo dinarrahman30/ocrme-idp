@@ -12,3 +12,5 @@ PyPDF2
 streamlit
 watchdog
 uvicorn
+google-generativeai
+python-dotenv

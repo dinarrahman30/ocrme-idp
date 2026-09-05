@@ -1,10 +1,15 @@
 import os
+import json
 import sqlite3
-import datetime
+import argparse
 import logging
+from dotenv import load_dotenv
 from src.prepocessing import clean_image
-from src.ocr_engine import image_to_text, process_pdf
-from src.parser import parse_bca_statement, parse_ktp, save_to_json, save_to_csv
+from src.ocr_engine import image_to_text, process_pdf, process_any_file
+from src.parser import smart_parse, save_to_json, save_to_csv
+
+# Load environment variables
+load_dotenv()
 
 # Setup logging
 logging.basicConfig(
@@ -16,14 +21,16 @@ logging.basicConfig(
     ]
 )
 
-DB_PATH = "data/ocr_database.db"
-INPUT_DIR = "data/input"
-OUTPUT_DIR = "data/output"
+DEFAULT_DB_PATH = "data/ocr_database.db"
+DEFAULT_INPUT_DIR = "data/input"
+DEFAULT_OUTPUT_DIR = "data/output"
+EXCLUDED_EXTENSIONS = {'.db', '.sqlite', '.log', '.pyc', '.py', '.git', '.ds_store'}
 
-def init_db():
-    """Initializes the SQLite database schema."""
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+def init_db(db_path=DEFAULT_DB_PATH):
+    """Initializes the SQLite database schema at any target location."""
+    db_path = os.path.abspath(os.path.expanduser(db_path))
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     # Process log table
@@ -71,36 +78,60 @@ def init_db():
             processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
+    # Generic document records table (for LLM-parsed documents of any type)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS document_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            file_path TEXT,
+            doc_type TEXT,
+            doc_subtype TEXT,
+            parsed_data TEXT,
+            parsing_method TEXT,
+            confidence REAL,
+            processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     
     conn.commit()
     conn.close()
-    logging.info("SQLite database initialized successfully.")
+    logging.info(f"SQLite database initialized at: {db_path}")
 
-def get_unprocessed_files():
-    """Returns list of files in INPUT_DIR that have not been processed successfully."""
-    if not os.path.exists(INPUT_DIR):
-        logging.warning(f"Input directory '{INPUT_DIR}' does not exist.")
+def get_unprocessed_files(input_dir=DEFAULT_INPUT_DIR, db_path=DEFAULT_DB_PATH):
+    """Returns list of files in input_dir (any path) that have not been processed successfully."""
+    input_dir = os.path.abspath(os.path.expanduser(input_dir))
+    if not os.path.exists(input_dir):
+        logging.warning(f"Input directory '{input_dir}' does not exist.")
         return []
         
     all_files = []
-    for root, _, files in os.walk(INPUT_DIR):
+    for root, _, files in os.walk(input_dir):
         for file in files:
+            if file.startswith('.'):
+                continue
             _, ext = os.path.splitext(file.lower())
-            if ext in [".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".tiff"]:
+            if ext not in EXCLUDED_EXTENSIONS:
                 all_files.append(os.path.join(root, file))
                 
-    conn = sqlite3.connect(DB_PATH)
+    db_path = os.path.abspath(os.path.expanduser(db_path))
+    if not os.path.exists(db_path):
+        return all_files
+
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT file_path FROM processed_files WHERE status = 'SUCCESS'")
-    processed = {row[0] for row in cursor.fetchall()}
+    try:
+        cursor.execute("SELECT file_path FROM processed_files WHERE status = 'SUCCESS'")
+        processed = {row[0] for row in cursor.fetchall()}
+    except sqlite3.OperationalError:
+        processed = set()
     conn.close()
     
-    unprocessed = [f for f in all_files if f not in processed]
+    unprocessed = [f for f in all_files if f not in processed and os.path.abspath(f) not in processed]
     return unprocessed
 
-def load_ktp_to_db(file_path, data):
+def load_ktp_to_db(file_path, data, db_path=DEFAULT_DB_PATH):
     """Loads a single parsed KTP record into SQLite."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.path.abspath(os.path.expanduser(db_path)))
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO ktp_records (
@@ -127,9 +158,9 @@ def load_ktp_to_db(file_path, data):
     conn.commit()
     conn.close()
 
-def load_transactions_to_db(file_path, transactions):
+def load_transactions_to_db(file_path, transactions, db_path=DEFAULT_DB_PATH):
     """Loads parsed bank statement transactions into SQLite."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.path.abspath(os.path.expanduser(db_path)))
     cursor = conn.cursor()
     for tx in transactions:
         cursor.execute("""
@@ -147,9 +178,28 @@ def load_transactions_to_db(file_path, transactions):
     conn.commit()
     conn.close()
 
-def update_file_status(file_path, status, error_message=None):
+def load_generic_to_db(file_path, doc_type, doc_subtype, parsed_data, parsing_method, confidence, db_path=DEFAULT_DB_PATH):
+    """Loads a generic LLM-parsed document record into SQLite."""
+    conn = sqlite3.connect(os.path.abspath(os.path.expanduser(db_path)))
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO document_records (
+            file_path, doc_type, doc_subtype, parsed_data, parsing_method, confidence
+        ) VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        file_path,
+        doc_type,
+        doc_subtype,
+        json.dumps(parsed_data, ensure_ascii=False) if not isinstance(parsed_data, str) else parsed_data,
+        parsing_method,
+        confidence,
+    ))
+    conn.commit()
+    conn.close()
+
+def update_file_status(file_path, status, error_message=None, db_path=DEFAULT_DB_PATH):
     """Updates the processing status of a file in the database."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(os.path.abspath(os.path.expanduser(db_path)))
     cursor = conn.cursor()
     cursor.execute("""
         INSERT OR REPLACE INTO processed_files (file_path, status, error_message, processed_at)
@@ -158,122 +208,141 @@ def update_file_status(file_path, status, error_message=None):
     conn.commit()
     conn.close()
 
-def process_file(file_path, engine="easyocr"):
-    """Runs OCR, parses text, and writes structured outputs to disk and database."""
+def process_file(file_path, engine="easyocr", use_llm=True, output_dir=DEFAULT_OUTPUT_DIR, db_path=DEFAULT_DB_PATH):
+    """Runs OCR/text extraction, parses text with LLM or regex, and writes structured outputs to disk and database."""
+    file_path = os.path.abspath(os.path.expanduser(file_path))
     logging.info(f"Starting processing for file: {file_path}")
     base_name, file_ext = os.path.splitext(os.path.basename(file_path))
     file_ext = file_ext.lower()
     
-    # 1. OCR Extraction
+    # 1. Text Extraction (OCR for images/PDFs, native parser for Office/text files)
     try:
-        if file_ext == ".pdf":
-            extracted_text = process_pdf(file_path, dpi=200, engine=engine)
-        else:
-            clean_img = clean_image(file_path)
-            extracted_text = image_to_text(clean_img, lang='ind+eng', engine=engine)
+        extracted_text = process_any_file(file_path, engine=engine)
     except Exception as e:
-        error_msg = f"OCR execution failed: {str(e)}"
+        error_msg = f"Text extraction failed: {str(e)}"
         logging.error(error_msg)
-        update_file_status(file_path, "FAILED", error_msg)
+        update_file_status(file_path, "FAILED", error_msg, db_path=db_path)
         return False
 
     if not extracted_text.strip():
         error_msg = "Extracted text is empty."
         logging.error(error_msg)
-        update_file_status(file_path, "FAILED", error_msg)
+        update_file_status(file_path, "FAILED", error_msg, db_path=db_path)
         return False
 
     # Save raw extracted text
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    raw_text_path = os.path.join(OUTPUT_DIR, f"hasil_{base_name}.txt")
+    os.makedirs(output_dir, exist_ok=True)
+    raw_text_path = os.path.join(output_dir, f"hasil_{base_name}.txt")
     with open(raw_text_path, "w", encoding="utf-8") as f:
         f.write(extracted_text)
     logging.info(f"Raw text output saved to {raw_text_path}")
 
-    # 2. Parsing & Loading
-    text_lower = extracted_text.lower()
-    is_ktp = "ktp" in base_name.lower() or "nik" in text_lower
-    is_bca = "bca" in base_name.lower() or "mutasi" in text_lower or "saldo" in text_lower
-    
+    # 2. Smart Parsing (LLM with regex fallback)
     try:
-        if is_ktp:
-            logging.info("KTP format detected. Parsing fields...")
-            parsed_data = parse_ktp(extracted_text)
-            
-            # Save files
-            json_path = os.path.join(OUTPUT_DIR, f"hasil_{base_name}.json")
-            save_to_json(parsed_data, json_path)
-            
-            # Load to DB
-            load_ktp_to_db(file_path, parsed_data)
-            logging.info(f"Parsed KTP data saved to JSON and loaded into SQLite.")
-            
-        elif is_bca:
-            logging.info("BCA Statement format detected. Parsing transactions...")
-            parsed_data = parse_bca_statement(extracted_text)
-            
-            # Save files
-            json_path = os.path.join(OUTPUT_DIR, f"hasil_{base_name}.json")
-            csv_path = os.path.join(OUTPUT_DIR, f"hasil_{base_name}.csv")
-            save_to_json(parsed_data, json_path)
-            save_to_csv(parsed_data, csv_path)
-            
-            # Load to DB
-            load_transactions_to_db(file_path, parsed_data)
-            logging.info(f"Parsed {len(parsed_data)} transactions to JSON/CSV and loaded into SQLite.")
-            
-        else:
-            logging.warning("Unknown document format. Skipping parsing step.")
-            update_file_status(file_path, "SUCCESS", "Parsed as generic/unknown format")
-            return True
-            
-        update_file_status(file_path, "SUCCESS")
+        result = smart_parse(extracted_text, use_llm=use_llm)
+        
+        doc_type = result["doc_type"]
+        doc_subtype = result["doc_subtype"]
+        confidence = result["confidence"]
+        parsed_data = result["data"]
+        method = result["method"]
+
+        logging.info(f"Parsed as {doc_type}/{doc_subtype} via {method} (confidence: {confidence})")
+
+        # Save JSON output with metadata
+        json_path = os.path.join(output_dir, f"hasil_{base_name}.json")
+        output_data = {
+            "metadata": {
+                "source_file": file_path,
+                "ocr_engine": engine,
+                "parsing_method": method,
+                "doc_type": doc_type,
+                "doc_subtype": doc_subtype,
+                "confidence": confidence,
+            },
+            "data": parsed_data,
+        }
+        save_to_json(output_data, json_path)
+
+        # 3. Load to appropriate database table
+        if doc_type == "identity_card":
+            ktp_data = parsed_data if isinstance(parsed_data, dict) else {}
+            load_ktp_to_db(file_path, ktp_data, db_path=db_path)
+            logging.info("Parsed KTP data loaded into SQLite ktp_records.")
+
+        elif doc_type == "bank_statement":
+            # Extract transactions list
+            transactions = None
+            if isinstance(parsed_data, list):
+                transactions = parsed_data
+            elif isinstance(parsed_data, dict) and "transactions" in parsed_data:
+                transactions = parsed_data["transactions"]
+
+            if transactions:
+                load_transactions_to_db(file_path, transactions, db_path=db_path)
+                logging.info(f"Parsed {len(transactions)} transactions loaded into SQLite bank_transactions.")
+
+                # Also save CSV
+                csv_path = os.path.join(output_dir, f"hasil_{base_name}.csv")
+                save_to_csv(transactions, csv_path)
+
+        # Always save to generic document_records table for full traceability
+        load_generic_to_db(file_path, doc_type, doc_subtype, parsed_data, method, confidence, db_path=db_path)
+
+        update_file_status(file_path, "SUCCESS", db_path=db_path)
         return True
         
     except Exception as e:
         error_msg = f"Parsing or Database loading failed: {str(e)}"
         logging.error(error_msg)
-        update_file_status(file_path, "FAILED", error_msg)
+        update_file_status(file_path, "FAILED", error_msg, db_path=db_path)
         return False
 
 def main():
+    parser = argparse.ArgumentParser(description="OCRMe — Batch ETL Pipeline Runner untuk Folder Apapun")
+    parser.add_argument("-d", "--input-dir", default=DEFAULT_INPUT_DIR, help="Folder berisi dokumen-dokumen yang ingin diproses (default: data/input)")
+    parser.add_argument("-o", "--output-dir", default=DEFAULT_OUTPUT_DIR, help="Folder tujuan hasil ekstraksi (default: data/output)")
+    parser.add_argument("-db", "--db-path", default=DEFAULT_DB_PATH, help="Path ke database SQLite (default: data/ocr_database.db)")
+    parser.add_argument("-e", "--engine", choices=["easyocr", "tesseract"], default="easyocr", help="OCR Engine (default: easyocr)")
+    parser.add_argument("-m", "--mode", choices=["auto", "llm", "regex"], default="auto", help="Metode Parsing (default: auto)")
+
+    args = parser.parse_args()
+
     print("====================================================")
-    print("                OCR ETL PIPELINE RUNNER             ")
+    print("          OCRMe — ETL PIPELINE RUNNER (LLM)         ")
     print("====================================================\n")
     
-    init_db()
+    init_db(db_path=args.db_path)
     
-    unprocessed = get_unprocessed_files()
+    unprocessed = get_unprocessed_files(input_dir=args.input_dir, db_path=args.db_path)
     if not unprocessed:
-        logging.info("No new unprocessed files found.")
+        logging.info(f"Tidak ada berkas baru yang perlu diproses di folder: '{args.input_dir}'.")
         print("\nPipeline finished: Everything is up-to-date.")
         return
         
-    print(f"Found {len(unprocessed)} new files to process:")
+    print(f"Ditemukan {len(unprocessed)} berkas di '{args.input_dir}' untuk diproses:")
     for f in unprocessed:
         print(f"  - {f}")
         
-    print("\nSelect OCR Engine:")
-    print("1. EasyOCR (Layout Preserving - Recommended for statement tables)")
-    print("2. Tesseract OCR (Fast - Recommended for plain documents)")
-    choice = input("Pilihan (1/2) [Default: 1]: ").strip()
-    engine = 'tesseract' if choice == '2' else 'easyocr'
+    engine = args.engine
+    use_llm = args.mode != "regex"
     
-    print(f"\nStarting pipeline execution with {engine} engine...\n")
+    print(f"\nStarting pipeline execution with {engine} engine and {args.mode.upper()} parsing...\n")
     
     success_count = 0
     for f in unprocessed:
-        success = process_file(f, engine=engine)
+        success = process_file(f, engine=engine, use_llm=use_llm, output_dir=args.output_dir, db_path=args.db_path)
         if success:
             success_count += 1
             
     print("\n====================================================")
     print("                  PIPELINE SUMMARY                  ")
     print("====================================================")
+    print(f"Input Directory      : {os.path.abspath(args.input_dir)}")
     print(f"Total files detected : {len(unprocessed)}")
     print(f"Successfully loaded  : {success_count}")
     print(f"Failed               : {len(unprocessed) - success_count}")
-    print(f"Database location    : {DB_PATH}")
+    print(f"Database location    : {os.path.abspath(args.db_path)}")
     print("====================================================")
 
 if __name__ == "__main__":

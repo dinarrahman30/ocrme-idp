@@ -46,3 +46,4 @@ data/output/*
 data/input/*
 !data/input/.gitkeep
 
+.vercel

@@ -1,0 +1,16 @@
+venv/
+venv_old/
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+*.log
+data/
+.git/
+.dockerignore
+Dockerfile
+docker-compose.yml
+dagster/
+dbt_ocr/
+node_modules/
+requirements.txt

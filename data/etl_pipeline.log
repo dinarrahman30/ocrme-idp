@@ -1,0 +1,169 @@
+2026-09-03 21:31:55,685 [INFO] SQLite database initialized successfully.
+2026-09-03 21:32:35,305 [INFO] SQLite database initialized successfully.
+2026-09-03 21:32:35,307 [INFO] Starting processing for file: data/input/BNI.pdf
+2026-09-03 21:32:36,218 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-03 21:39:17,011 [INFO] Raw text output saved to data/output/hasil_BNI.txt
+2026-09-03 21:39:18,259 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-03 21:39:18,259 [INFO] Regex fallback: detected BCA statement
+2026-09-03 21:39:18,262 [INFO] Parsed as bank_statement/Mutasi BCA via regex (confidence: 0.7)
+2026-09-03 21:39:18,264 [WARNING] Bank statement detected but no transactions extracted.
+2026-09-03 21:39:18,280 [INFO] Starting processing for file: data/input/BCA.pdf
+2026-09-03 21:50:34,251 [INFO] Raw text output saved to data/output/hasil_BCA.txt
+2026-09-03 21:50:34,255 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-03 21:50:34,256 [INFO] Regex fallback: detected BCA statement
+2026-09-03 21:50:34,266 [INFO] Parsed as bank_statement/Mutasi BCA via regex (confidence: 0.7)
+2026-09-03 21:50:34,285 [INFO] Parsed 147 transactions loaded into SQLite bank_transactions.
+2026-09-03 21:50:34,301 [INFO] Starting processing for file: data/input/BRI GSJA Kaltim.pdf
+2026-09-03 21:58:30,813 [INFO] Raw text output saved to data/output/hasil_BRI GSJA Kaltim.txt
+2026-09-03 21:58:30,818 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-03 21:58:30,818 [INFO] Regex fallback: detected BCA statement
+2026-09-03 21:58:30,824 [INFO] Parsed as bank_statement/Mutasi BCA via regex (confidence: 0.7)
+2026-09-03 21:58:30,841 [INFO] Parsed 98 transactions loaded into SQLite bank_transactions.
+2026-09-03 21:58:30,859 [INFO] Starting processing for file: data/input/KTP.jpg
+2026-09-03 21:59:02,132 [INFO] Raw text output saved to data/output/hasil_KTP.txt
+2026-09-03 21:59:02,132 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-03 21:59:02,132 [WARNING] Regex fallback: unknown document type
+2026-09-03 21:59:02,133 [INFO] Parsed as other/Unknown via regex (confidence: 0.0)
+2026-09-04 00:21:11,285 [INFO] SQLite database initialized successfully.
+2026-09-04 00:28:36,056 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 00:44:31,313 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 00:47:43,778 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 00:47:44,451 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 01:06:39,013 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:09:17,362 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:09:34,226 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:09:37,252 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:09:42,621 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:09:47,794 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:28:01,495 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:28:19,619 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:28:21,686 [INFO] Attempting LLM-based parsing...
+2026-09-04 01:28:21,687 [INFO] GeminiClient initialized with model: gemini-2.0-flash
+2026-09-04 01:28:21,952 [ERROR] Gemini API error: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 01:28:21,952 [WARNING] LLM parsing failed, falling back to regex: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 01:28:21,953 [INFO] Regex fallback: detected BCA statement
+2026-09-04 01:29:21,665 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:29:24,167 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:29:24,910 [INFO] Attempting LLM-based parsing...
+2026-09-04 01:29:24,910 [INFO] GeminiClient initialized with model: gemini-2.0-flash
+2026-09-04 01:29:25,167 [ERROR] Gemini API error: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 01:29:25,168 [WARNING] LLM parsing failed, falling back to regex: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 01:29:25,168 [INFO] Regex fallback: detected BCA statement
+2026-09-04 01:29:42,812 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:29:45,764 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 01:29:46,463 [INFO] Attempting LLM-based parsing...
+2026-09-04 01:29:46,464 [INFO] GeminiClient initialized with model: gemini-2.0-flash
+2026-09-04 01:29:46,682 [ERROR] Gemini API error: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 01:29:46,682 [WARNING] LLM parsing failed, falling back to regex: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 01:29:46,683 [INFO] Regex fallback: detected BCA statement
+2026-09-04 07:36:39,093 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 07:41:31,366 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 07:41:36,244 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 07:41:37,235 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 07:42:35,490 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-04 07:42:35,491 [WARNING] Regex fallback: unknown document type
+2026-09-04 07:42:47,768 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 07:42:49,046 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 07:45:07,481 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 07:45:08,680 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 08:30:41,160 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 09:12:47,196 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 09:12:54,798 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 09:12:56,059 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-04 09:12:56,060 [INFO] Regex fallback: detected BCA statement
+2026-09-04 10:52:49,858 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 10:55:34,139 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 10:55:37,860 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 10:55:38,004 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 10:56:01,113 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-04 10:56:01,117 [WARNING] Regex fallback: unknown document type
+2026-09-04 11:03:50,848 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:03:56,672 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:04:17,205 [INFO] Attempting LLM-based parsing...
+2026-09-04 11:04:17,206 [INFO] GeminiClient initialized with model: gemini-2.0-flash
+2026-09-04 11:04:17,549 [ERROR] Gemini API error: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 11:04:17,549 [WARNING] LLM parsing failed, falling back to regex: 404 This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.
+2026-09-04 11:04:17,549 [WARNING] Regex fallback: unknown document type
+2026-09-04 11:09:10,344 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:09:22,990 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:09:25,966 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:09:26,130 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 11:09:52,752 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-04 11:09:52,752 [WARNING] Regex fallback: unknown document type
+2026-09-04 11:10:15,349 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:10:54,138 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:10:57,627 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:10:57,775 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-04 11:10:57,777 [INFO] Regex fallback: detected BCA statement
+2026-09-04 11:11:55,009 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:14:07,755 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:14:19,490 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:14:24,473 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:15:12,374 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:15:28,551 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:15:30,650 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:15:30,953 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 11:15:54,797 [INFO] Attempting LLM-based parsing...
+2026-09-04 11:15:54,798 [INFO] GeminiClient initialized with model: gemini-3.6-flash
+2026-09-04 11:16:29,599 [INFO] Full pipeline completed: invoice / sales_invoice
+2026-09-04 11:16:29,599 [INFO] LLM parsing successful: invoice/sales_invoice (confidence: 0.98)
+2026-09-04 11:28:59,041 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:29:23,285 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:29:36,933 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:29:46,609 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:29:49,358 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 11:29:49,461 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 11:30:13,011 [INFO] Attempting LLM-based parsing...
+2026-09-04 11:30:13,012 [INFO] GeminiClient initialized with model: gemini-3.6-flash
+2026-09-04 11:31:38,112 [INFO] Full pipeline completed: invoice / Commercial Invoice
+2026-09-04 11:31:38,113 [INFO] LLM parsing successful: invoice/Commercial Invoice (confidence: 0.98)
+2026-09-04 12:28:47,560 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:29:33,096 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:29:41,683 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:29:44,751 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:29:44,897 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 12:30:09,870 [INFO] Attempting LLM-based parsing...
+2026-09-04 12:30:09,870 [INFO] GeminiClient initialized with model: gemini-3.6-flash
+2026-09-04 12:30:48,224 [INFO] Full pipeline completed: invoice / standard_invoice
+2026-09-04 12:30:48,225 [INFO] LLM parsing successful: invoice/standard_invoice (confidence: 0.98)
+2026-09-04 12:48:24,207 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:58:18,721 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:58:23,538 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 12:58:23,716 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 12:58:54,006 [INFO] LLM not available (missing API key or package). Using regex parser.
+2026-09-04 12:58:54,007 [INFO] Regex fallback: detected invoice / receipt document
+2026-09-04 13:42:49,299 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 13:42:52,068 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 13:43:21,242 [INFO] Attempting LLM-based parsing...
+2026-09-04 13:43:21,243 [INFO] GeminiClient initialized with model: gemini-3.6-flash
+2026-09-04 13:45:31,645 [INFO] Full pipeline completed: invoice / commercial invoice
+2026-09-04 13:45:31,645 [INFO] LLM parsing successful: invoice/commercial invoice (confidence: 0.98)
+2026-09-04 13:46:12,889 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 13:46:19,298 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 13:46:50,236 [INFO] Regex fallback: detected invoice / receipt document
+2026-09-04 14:13:54,929 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 14:13:58,665 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 14:14:48,171 [INFO] Attempting LLM-based parsing...
+2026-09-04 14:14:48,230 [INFO] GeminiClient initialized with model: gemini-3.6-flash
+2026-09-04 14:15:16,619 [INFO] Full pipeline completed: invoice / faktur_penjualan
+2026-09-04 14:15:16,620 [INFO] LLM parsing successful: invoice/faktur_penjualan (confidence: 0.98)
+2026-09-04 14:37:28,447 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:44:35,795 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:45:09,464 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:45:14,837 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:45:24,503 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:45:46,072 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:45:52,885 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:45:53,055 [WARNING] Using CPU. Note: This module is much faster with a GPU.
+2026-09-04 20:48:58,176 [INFO] Attempting LLM-based parsing with provider: gemini...
+2026-09-04 20:48:58,178 [INFO] MultiProviderLLMClient initialized with provider: gemini
+2026-09-04 20:50:04,902 [INFO] LLM parsing successful: invoice/Sales Invoice (confidence: 0.98)
+2026-09-04 20:52:50,732 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:52:51,102 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:53:10,434 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 20:53:17,044 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 21:01:45,450 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 21:01:49,443 [INFO] SQLite database initialized at: /home/dinarrahmann/Downloads/OCRSample-20260721T081855Z-1-001/OCRSample/data/ocr_database.db
+2026-09-04 21:03:56,958 [INFO] Attempting LLM-based parsing with provider: gemini...
+2026-09-04 21:03:56,961 [INFO] MultiProviderLLMClient initialized with provider: gemini
+2026-09-04 21:04:53,118 [INFO] LLM parsing successful: invoice/Sales Invoice (confidence: 0.99)

@@ -1,0 +1,27 @@
+# Environment & virtual environments
+venv/
+.venv/
+env/
+.env
+
+# Python bytecode & cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Git & IDE files
+.git/
+.gitignore
+.vscode/
+.idea/
+.agents/
+
+# Project temporary outputs & database
+data/output/*
+!data/output/.gitkeep
+data/ocr_database.db*
+
+# Documentation artifacts
+*.log

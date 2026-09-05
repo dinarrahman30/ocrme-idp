@@ -39,9 +39,32 @@ def main():
         print(f"\nStats: Total Transactions = {count or 0}, Total CR = {total_cr or 0:.2f}, Total DB = {total_db or 0:.2f}")
     except Exception as e:
         print(f"Error reading bank_transactions: {e}")
+
+    # 4. Generic Document Records (LLM-parsed)
+    print("\n[4] Document Records (LLM-Parsed) — Top 10:")
+    try:
+        df_docs = pd.read_sql_query(
+            "SELECT id, file_path, doc_type, doc_subtype, parsing_method, confidence, processed_at "
+            "FROM document_records ORDER BY processed_at DESC LIMIT 10", conn
+        )
+        if not df_docs.empty:
+            print(df_docs.to_string(index=False))
+            
+            # Count by type
+            cursor = conn.cursor()
+            cursor.execute("SELECT doc_type, parsing_method, COUNT(*) FROM document_records GROUP BY doc_type, parsing_method")
+            rows = cursor.fetchall()
+            if rows:
+                print("\nSummary by Type & Method:")
+                for doc_type, method, count in rows:
+                    print(f"  {doc_type} ({method}): {count} records")
+        else:
+            print("Empty table.")
+    except Exception as e:
+        print(f"Error reading document_records: {e}")
         
     conn.close()
-    print("====================================================")
+    print("\n====================================================")
 
 if __name__ == "__main__":
     main()

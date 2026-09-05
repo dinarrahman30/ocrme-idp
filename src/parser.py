@@ -1,6 +1,13 @@
 import re
 import json
 import csv
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ==============================================================================
+# Utility Functions
+# ==============================================================================
 
 def is_numeric(s):
     # Remove spaces, commas, periods
@@ -42,6 +49,10 @@ def is_boilerplate(line):
         if kw in l:
             return True
     return False
+
+# ==============================================================================
+# Legacy Regex Parsers (Fallback)
+# ==============================================================================
 
 def parse_bca_statement(text):
     """
@@ -158,6 +169,192 @@ def parse_ktp(text):
     
     return data
 
+def parse_invoice(text):
+    """
+    Parses invoice/receipt text using regex key-value and line item extraction.
+    """
+    header = {}
+    summary = {}
+    
+    inv_no_match = re.search(r'(?:invoice|faktur|kwitansi|receipt|inv|no\.?)\s*#?\s*[:;]?\s*([A-Za-z0-9\-\/]+)', text, re.IGNORECASE)
+    if inv_no_match:
+        header["invoice_number"] = inv_no_match.group(1).strip()
+        
+    date_match = re.search(r'(?:date|tanggal|tgl)\s*[:;]?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}|\d{1,2}\s+[A-Za-z]+\s+\d{4})', text, re.IGNORECASE)
+    if date_match:
+        header["invoice_date"] = date_match.group(1).strip()
+
+    due_match = re.search(r'(?:due date|jatuh tempo)\s*[:;]?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})', text, re.IGNORECASE)
+    if due_match:
+        header["due_date"] = due_match.group(1).strip()
+
+    total_match = re.search(r'(?:total|grand total|jumlah total|total bayar)\s*[:;]?\s*(?:rp\.?|idr)?\s*([\d\.,\s]+)', text, re.IGNORECASE)
+    if total_match:
+        summary["total_amount"] = parse_numeric(total_match.group(1))
+
+    subtotal_match = re.search(r'(?:subtotal|sub total)\s*[:;]?\s*(?:rp\.?|idr)?\s*([\d\.,\s]+)', text, re.IGNORECASE)
+    if subtotal_match:
+        summary["subtotal"] = parse_numeric(subtotal_match.group(1))
+
+    tax_match = re.search(r'(?:tax|vat|ppn|pajak)\s*[:;]?\s*(?:rp\.?|idr)?\s*([\d\.,\s]+)', text, re.IGNORECASE)
+    if tax_match:
+        summary["tax_amount"] = parse_numeric(tax_match.group(1))
+
+    # Line item regex extraction (lines with item text followed by numeric values)
+    line_items = []
+    lines = text.split('\n')
+    for line in lines:
+        line_s = line.strip()
+        match = re.search(r'^([A-Za-z0-9\s\-\._\/]+?)\s{2,}(\d+)\s{2,}(?:rp\.?|idr)?\s*([\d\.,]+)\s{2,}(?:rp\.?|idr)?\s*([\d\.,]+)$', line_s, re.IGNORECASE)
+        if match:
+            line_items.append({
+                "item_name": match.group(1).strip(),
+                "quantity": int(match.group(2)),
+                "unit_price": parse_numeric(match.group(3)),
+                "total_price": parse_numeric(match.group(4))
+            })
+
+    return {
+        "header": header,
+        "line_items": line_items,
+        "summary": summary
+    }
+
+# ==============================================================================
+# LLM-Powered Parsing
+# ==============================================================================
+
+def parse_with_llm(raw_text, use_three_step=False, provider="gemini", api_key=None, model_name=None):
+    """
+    Parses document text using MultiProviderLLMClient.
+    
+    Args:
+        raw_text: Raw OCR-extracted text
+        use_three_step: If True, uses 3 separate API calls.
+        provider: 'gemini', 'openai', 'claude', or 'ollama'
+        api_key: API Key string
+        model_name: Model name string
+    
+    Returns:
+        dict with keys: doc_type, doc_subtype, confidence, data, method
+    """
+    from src.llm_client import MultiProviderLLMClient
+
+    client = MultiProviderLLMClient(provider=provider, api_key=api_key, model_name=model_name)
+
+    if use_three_step:
+        result = client.process_three_step(raw_text)
+    else:
+        result = client.process_full(raw_text)
+
+    classification = result.get("classification", {})
+    
+    return {
+        "doc_type": classification.get("doc_type", "other"),
+        "doc_subtype": classification.get("doc_subtype", "Unknown"),
+        "confidence": classification.get("confidence", 0.0),
+        "data": result.get("extracted_data", {}),
+        "method": f"llm ({provider})",
+    }
+
+
+def smart_parse(raw_text, use_llm=True, provider="gemini", api_key=None, model_name=None):
+    """
+    Intelligent parsing entry point with automatic fallback.
+    
+    Strategy:
+    1. If use_llm=True and LLM is available → use MultiProvider LLM (Gemini, OpenAI, Claude, Ollama)
+    2. If LLM fails or unavailable → fallback to regex parser
+    3. If regex doesn't match → return raw text result
+    
+    Args:
+        raw_text: Raw OCR-extracted text
+        use_llm: Whether to attempt LLM parsing first (default True)
+        provider: 'gemini', 'openai', 'claude', or 'ollama'
+        api_key: API Key string
+        model_name: Model name string
+    
+    Returns:
+        dict with keys: doc_type, doc_subtype, confidence, data, method
+    """
+    # Attempt LLM parsing
+    if use_llm:
+        from src.llm_client import is_llm_available
+        if is_llm_available(provider=provider):
+            try:
+                logger.info(f"Attempting LLM-based parsing with provider: {provider}...")
+                result = parse_with_llm(raw_text, provider=provider, api_key=api_key, model_name=model_name)
+                logger.info(
+                    f"LLM parsing successful: {result['doc_type']}/{result['doc_subtype']} "
+                    f"(confidence: {result['confidence']})"
+                )
+                return result
+            except Exception as e:
+                logger.warning(f"LLM parsing failed, falling back to regex: {str(e)}")
+        else:
+            logger.info(f"LLM not available for provider {provider} (missing API key). Using regex parser.")
+
+    # Fallback to regex parser
+    return _regex_fallback(raw_text)
+
+
+def _regex_fallback(raw_text):
+    """
+    Applies legacy regex parsers based on keyword detection.
+    """
+    text_lower = raw_text.lower()
+    
+    # Detect KTP
+    if "nik" in text_lower or "ktp" in text_lower:
+        logger.info("Regex fallback: detected KTP document")
+        parsed_data = parse_ktp(raw_text)
+        return {
+            "doc_type": "identity_card",
+            "doc_subtype": "KTP",
+            "confidence": 0.7,
+            "data": parsed_data,
+            "method": "regex",
+        }
+
+    # Detect Invoice / Receipt / Faktur
+    if any(kw in text_lower for kw in ["invoice", "faktur", "receipt", "kwitansi", "subtotal", "total bayar", "bill to", "due date"]):
+        logger.info("Regex fallback: detected invoice / receipt document")
+        parsed_data = parse_invoice(raw_text)
+        return {
+            "doc_type": "invoice",
+            "doc_subtype": "Invoice / Receipt",
+            "confidence": 0.7,
+            "data": parsed_data,
+            "method": "regex",
+        }
+
+    # Detect BCA Statement
+    if "bca" in text_lower or "mutasi" in text_lower or "saldo" in text_lower:
+        logger.info("Regex fallback: detected BCA statement")
+        parsed_data = parse_bca_statement(raw_text)
+        return {
+            "doc_type": "bank_statement",
+            "doc_subtype": "Mutasi BCA",
+            "confidence": 0.7,
+            "data": parsed_data,
+            "method": "regex",
+        }
+
+    # Unknown document
+    logger.warning("Regex fallback: unknown document type")
+    return {
+        "doc_type": "other",
+        "doc_subtype": "Unknown",
+        "confidence": 0.0,
+        "data": {"raw_text": raw_text},
+        "method": "regex",
+    }
+
+
+# ==============================================================================
+# File Output Helpers
+# ==============================================================================
+
 def save_to_json(data, output_path):
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
@@ -165,6 +362,8 @@ def save_to_json(data, output_path):
 def save_to_csv(data, output_path):
     if not data:
         return
+    if isinstance(data, dict):
+        data = [data]
     headers = data[0].keys()
     with open(output_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=headers)
