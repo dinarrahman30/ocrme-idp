@@ -231,25 +231,29 @@ with st.sidebar:
     if ai_provider == "openai":
         api_key_input = st.text_input(
             "OpenAI API key",
-            value=os.environ.get("OPENAI_API_KEY", ""),
+            value="",
             type="password",
-            placeholder="sk-proj-...",
+            placeholder="Masukkan OpenAI API Key Anda (sk-proj-...)",
             help="Enter your OpenAI API Key."
         )
         if api_key_input:
             os.environ["OPENAI_API_KEY"] = api_key_input
+        else:
+            os.environ.pop("OPENAI_API_KEY", None)
         model_name_input = st.text_input("OpenAI Model", value="gpt-4o-mini", placeholder="gpt-4o-mini")
 
     elif ai_provider == "claude":
         api_key_input = st.text_input(
             "Anthropic API key",
-            value=os.environ.get("ANTHROPIC_API_KEY", ""),
+            value="",
             type="password",
-            placeholder="sk-ant-...",
+            placeholder="Masukkan Anthropic API Key Anda (sk-ant-...)",
             help="Enter your Anthropic Claude API Key."
         )
         if api_key_input:
             os.environ["ANTHROPIC_API_KEY"] = api_key_input
+        else:
+            os.environ.pop("ANTHROPIC_API_KEY", None)
         model_name_input = st.text_input("Claude Model", value="claude-3-5-haiku-20241022", placeholder="claude-3-5-haiku-20241022")
 
     elif ai_provider == "ollama":
@@ -259,13 +263,15 @@ with st.sidebar:
     else:
         api_key_input = st.text_input(
             "Gemini API key",
-            value=os.environ.get("GEMINI_API_KEY", ""),
+            value="",
             type="password",
             help="Paste your Google Gemini API key to enable AI multi-category adaptive extraction.",
-            placeholder="AIzaSy..."
+            placeholder="Masukkan Gemini API Key Anda (AIzaSy...)"
         )
         if api_key_input:
             os.environ["GEMINI_API_KEY"] = api_key_input
+        else:
+            os.environ.pop("GEMINI_API_KEY", None)
         model_name_input = st.text_input("Gemini Model", value="gemini-3.6-flash", placeholder="gemini-3.6-flash")
 
     st.space("small")
