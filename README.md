@@ -149,7 +149,7 @@ pip install -r requirements.txt
 ### 2. Configure Gemini API Key (Optional)
 Create or update your `.env` file with your Google Gemini API key:
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.6-flash
 ```
 *(If no API key is set, OCRMe automatically runs using the local Regex Fallback Engine).*
