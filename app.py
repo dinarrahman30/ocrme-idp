@@ -208,14 +208,14 @@ init_db()
 # Sidebar Control & Configuration Panel
 # ==============================================================================
 with st.sidebar:
-    st.markdown("### :material/tune: Control Panel")
+    st.markdown("### :material/tune: Control panel")
     st.caption("Configure AI providers, models, OCR engines, and API keys.")
     st.space("small")
 
     # AI Provider Selection Dropdown
-    st.markdown("**AI Provider Selection**")
+    st.markdown("**AI provider selection**")
     ai_provider = st.selectbox(
-        "AI Provider",
+        "AI provider",
         options=["gemini", "openai", "claude", "ollama"],
         format_func=lambda x: {
             "gemini": "Google Gemini AI",
@@ -240,7 +240,7 @@ with st.sidebar:
             os.environ["OPENAI_API_KEY"] = api_key_input
         else:
             os.environ.pop("OPENAI_API_KEY", None)
-        model_name_input = st.text_input("OpenAI Model", value="gpt-4o-mini", placeholder="gpt-4o-mini")
+        model_name_input = st.text_input("OpenAI model", value="gpt-4o-mini", placeholder="gpt-4o-mini")
 
     elif ai_provider == "claude":
         api_key_input = st.text_input(
@@ -254,11 +254,11 @@ with st.sidebar:
             os.environ["ANTHROPIC_API_KEY"] = api_key_input
         else:
             os.environ.pop("ANTHROPIC_API_KEY", None)
-        model_name_input = st.text_input("Claude Model", value="claude-3-5-haiku-20241022", placeholder="claude-3-5-haiku-20241022")
+        model_name_input = st.text_input("Claude model", value="claude-3-5-haiku-20241022", placeholder="claude-3-5-haiku-20241022")
 
     elif ai_provider == "ollama":
-        api_key_input = st.text_input("Ollama Host URL", value=os.environ.get("OLLAMA_HOST", "http://localhost:11434"))
-        model_name_input = st.text_input("Ollama Model", value="llama3.1", placeholder="llama3.1")
+        api_key_input = st.text_input("Ollama host URL", value=os.environ.get("OLLAMA_HOST", "http://localhost:11434"))
+        model_name_input = st.text_input("Ollama model", value="llama3.1", placeholder="llama3.1")
 
     else:
         api_key_input = st.text_input(
@@ -272,7 +272,7 @@ with st.sidebar:
             os.environ["GEMINI_API_KEY"] = api_key_input
         else:
             os.environ.pop("GEMINI_API_KEY", None)
-        model_name_input = st.text_input("Gemini Model", value="gemini-3.6-flash", placeholder="gemini-3.6-flash")
+        model_name_input = st.text_input("Gemini model", value="gemini-3.6-flash", placeholder="gemini-3.6-flash")
 
     st.space("small")
 
@@ -281,7 +281,7 @@ with st.sidebar:
     engine_choice = st.segmented_control(
         "OCR engine",
         options=["easyocr", "tesseract"],
-        format_func=lambda x: "EasyOCR (Layout Preserving)" if x == "easyocr" else "Tesseract OCR (Fast)",
+        format_func=lambda x: "EasyOCR (Layout preserving)" if x == "easyocr" else "Tesseract OCR (Fast)",
         default="easyocr",
         label_visibility="collapsed"
     )
@@ -295,8 +295,8 @@ with st.sidebar:
         options=["auto", "llm", "regex"],
         format_func=lambda x: {
             "auto": f"Auto ({ai_provider.title()} AI → Regex)",
-            "llm": f"{ai_provider.title()} AI Only",
-            "regex": "Regex Fallback Only"
+            "llm": f"{ai_provider.title()} AI only",
+            "regex": "Regex fallback only"
         }[x],
         default="auto",
         label_visibility="collapsed"
@@ -306,14 +306,15 @@ with st.sidebar:
 
     # System Status Card
     with st.container(border=True):
-        st.markdown("##### :material/monitor_heart: System Status")
+        st.markdown("##### :material/monitor_heart: System status")
         has_key = bool(api_key_input) or ai_provider == "ollama"
+        if has_key:
+            st.caption(":material/check_circle: **AI Provider**: Active")
+        else:
+            st.caption(":material/offline_bolt: **AI Provider**: Regex mode")
         
-        st.write("**LLM Provider:**", f"`{ai_provider.upper()}`")
-        st.write("**LLM Status:**", f":green-badge[{ai_provider.title()} Active]" if has_key else ":orange-badge[Regex Fallback Mode]")
-        st.write("**OCR engine:**", f"`{engine_choice.upper()}`")
-        st.write("**Parsing mode:**", f"`{parsing_mode.upper()}`")
-        st.caption(f":material/database: SQLite: `{os.path.basename(DEFAULT_DB_PATH)}`")
+        st.caption(f":material/document_scanner: **OCR Engine**: {engine_choice.upper()}")
+        st.caption(f":material/schema: **Parsing Mode**: {parsing_mode.upper()}")
 
     st.space("medium")
     st.markdown("""
@@ -324,11 +325,13 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ==============================================================================
-# Main Header Hero Banner
+# Main Content Area
 # ==============================================================================
+
+# Top Header Hero Banner
 st.markdown("""
 <div class="main-header-card">
-    <div class="badge-pill">✨ Universal Document Intelligence</div>
+    <div class="badge-pill">✨ Universal Document Intelligence System</div>
     <div class="main-title">🔍 OCRMe — Intelligent Document Processing</div>
     <div class="main-subtitle">
         Automated text extraction, multi-category document classification, and AI-powered structured data parsing for any document type—invoices, receipts, tax forms, identity cards, bank statements, spreadsheets, and Office files.
