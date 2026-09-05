@@ -274,25 +274,26 @@ async function processRealFileOCR(file) {
   };
 }
 
-async function handleFileSelected(file) {
+function handleFileSelected(file) {
   currentUploadedFile = file;
 
+  // Status badge indicates file is selected & ready to be processed
   const statusBadge = document.getElementById('status-badge');
   if (statusBadge) {
-    statusBadge.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Executing Real OCR...`;
-    statusBadge.style.background = 'rgba(245, 158, 11, 0.2)';
-    statusBadge.style.color = '#fbbf24';
+    statusBadge.innerHTML = `<i data-lucide="file-check" style="width: 13px; height: 13px;"></i> File Ready`;
+    statusBadge.style.background = 'rgba(59, 130, 246, 0.2)';
+    statusBadge.style.color = '#60a5fa';
     if (window.lucide) lucide.createIcons();
   }
 
   const dropZone = document.getElementById('drop-zone');
   if (dropZone) {
     dropZone.innerHTML = `
-      <div class="drop-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
-        <i data-lucide="check-circle-2" style="width: 28px; height: 28px;"></i>
+      <div class="drop-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+        <i data-lucide="file-check-2" style="width: 28px; height: 28px;"></i>
       </div>
       <h4 style="font-weight: 600; margin-bottom: 0.3rem;">File Terpilih: ${file.name}</h4>
-      <p style="font-size: 0.85rem; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB — Teks Sedang Diekstrak</p>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB — Klik "Process &amp; Extract Document" untuk mengekstrak</p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
         <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx">
         <button class="btn btn-secondary" style="padding: 0.4rem 0.86rem; font-size: 0.8rem;" onclick="document.getElementById('file-input').click()">
@@ -315,16 +316,28 @@ async function handleFileSelected(file) {
     }
   }
 
-  // Execute Real OCR & Extraction for uploaded file!
-  currentResult = await processRealFileOCR(file);
+  // Render Document Preview ONLY (so user can view their file preview without running OCR yet!)
+  renderDocumentPreview(null, currentUploadedFile);
 
-  if (statusBadge) {
-    statusBadge.innerHTML = `Success`;
-    statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
-    statusBadge.style.color = '#34d399';
-  }
+  // Set Info pills to waiting state
+  const elType = document.getElementById('res-doc-type');
+  const elConf = document.getElementById('res-confidence');
+  const elMethod = document.getElementById('res-method');
+  const elEngine = document.getElementById('res-engine');
+  if (elType) elType.textContent = `File: ${file.name}`;
+  if (elConf) elConf.textContent = 'Menunggu Proses';
+  if (elMethod) elMethod.textContent = 'Klik Process';
+  if (elEngine) elEngine.textContent = '-';
 
-  renderResults(currentResult, currentUploadedFile);
+  // Set JSON & Raw Text placeholders
+  const jsonOutput = document.getElementById('json-output');
+  if (jsonOutput) jsonOutput.textContent = `// File "${file.name}" telah terpilih.\n// Silakan klik tombol "Process & Extract Document" untuk mengekstrak data OCR.`;
+
+  const rawTextOutput = document.getElementById('raw-text-output');
+  if (rawTextOutput) rawTextOutput.textContent = `// Silakan klik "Process & Extract Document" untuk mengekstrak teks asli dari file "${file.name}".`;
+
+  const tbody = document.getElementById('table-items-body');
+  if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Klik "Process & Extract Document" untuk mengekstrak data tabel</td></tr>`;
 }
 
 // Reset Dropzone & Clear Extracted Results State
