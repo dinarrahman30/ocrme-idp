@@ -209,10 +209,15 @@ function handleFileSelected(file) {
       </div>
       <h4 style="font-weight: 600; margin-bottom: 0.3rem;">File Terpilih: ${file.name}</h4>
       <p style="font-size: 0.85rem; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB — Siap Untuk Ekstraksi OCR</p>
-      <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx">
-      <button class="btn btn-secondary" style="margin-top: 1rem; padding: 0.4rem 0.86rem; font-size: 0.8rem;" onclick="document.getElementById('file-input').click()">
-        Pilih File Lain
-      </button>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+        <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx">
+        <button class="btn btn-secondary" style="padding: 0.4rem 0.86rem; font-size: 0.8rem;" onclick="document.getElementById('file-input').click()">
+          <i data-lucide="folder-open" style="width: 14px; height: 14px;"></i> Pilih File Lain
+        </button>
+        <button class="btn btn-secondary" style="padding: 0.4rem 0.86rem; font-size: 0.8rem; background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #f43f5e;" onclick="resetUploadZone()">
+          <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i> Reset / Hapus
+        </button>
+      </div>
     `;
     if (window.lucide) lucide.createIcons();
 
@@ -229,6 +234,77 @@ function handleFileSelected(file) {
 
   // Render results immediately for the newly dropped file!
   renderResults(currentResult, currentUploadedFile);
+}
+
+// Reset Dropzone & Clear Extracted Results State
+function resetUploadZone() {
+  currentUploadedFile = null;
+  currentResult = null;
+
+  const dropZone = document.getElementById('drop-zone');
+  if (dropZone) {
+    dropZone.innerHTML = `
+      <div class="drop-icon">
+        <i data-lucide="file-up" style="width: 28px; height: 28px;"></i>
+      </div>
+      <h4 style="font-weight: 600; margin-bottom: 0.3rem;">Drag &amp; drop your document here</h4>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);">Supports PDF, PNG, JPG, WEBP, DOCX, XLSX</p>
+      <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx">
+      <button class="btn btn-secondary" style="margin-top: 1.25rem;" onclick="document.getElementById('file-input').click()">
+        Browse Files
+      </button>
+    `;
+    if (window.lucide) lucide.createIcons();
+
+    const newFileInput = document.getElementById('file-input');
+    if (newFileInput) {
+      newFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelected(e.target.files[0]);
+        }
+      });
+    }
+  }
+
+  // Reset Extraction Results area back to initial empty state
+  const elType = document.getElementById('res-doc-type');
+  const elConf = document.getElementById('res-confidence');
+  const elMethod = document.getElementById('res-method');
+  const elEngine = document.getElementById('res-engine');
+  if (elType) elType.textContent = '-';
+  if (elConf) elConf.textContent = '-';
+  if (elMethod) elMethod.textContent = '-';
+  if (elEngine) elEngine.textContent = '-';
+
+  const statusBadge = document.getElementById('status-badge');
+  if (statusBadge) {
+    statusBadge.innerHTML = 'Ready';
+    statusBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+    statusBadge.style.color = '#34d399';
+  }
+
+  const jsonOutput = document.getElementById('json-output');
+  if (jsonOutput) jsonOutput.textContent = '// Click "Process & Extract Document" or select a sample above...';
+
+  const rawTextOutput = document.getElementById('raw-text-output');
+  if (rawTextOutput) rawTextOutput.textContent = '// Raw extracted OCR text will appear here...';
+
+  const tbody = document.getElementById('table-items-body');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No transaction items parsed yet</td></tr>';
+
+  const previewBox = document.getElementById('preview-display-box');
+  if (previewBox) {
+    previewBox.innerHTML = `
+      <div style="background: rgba(59, 130, 246, 0.1); border-radius: 50%; padding: 1.25rem; margin-bottom: 1rem; color: #60a5fa;">
+        <i data-lucide="file-search" style="width: 36px; height: 36px;"></i>
+      </div>
+      <h4 style="font-weight: 600; font-size: 1.05rem; margin-bottom: 0.4rem; color: var(--text-primary);">Belum Ada Dokumen Yang Dipilih</h4>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); max-width: 420px;">
+        Silakan unggah file di kolom sebelah kiri atau klik sampel dokumen (<em>Invoice</em>, <em>KTP</em>, <em>Bank Statement</em>) untuk menampilkan pratinjau visual &amp; hasil ekstraksi OCR.
+      </p>
+    `;
+    if (window.lucide) lucide.createIcons();
+  }
 }
 
 // Result View Switcher (Preview / JSON / CSV / Raw)
