@@ -275,11 +275,20 @@ main {
 .drop-zone {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
-  padding: 3rem 2rem;
+  padding: 2.25rem 1.25rem;
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-fast);
   background: rgba(255, 255, 255, 0.02);
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.drop-zone h4, .drop-zone p, .drop-zone div {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-all;
 }
 
 .drop-zone:hover, .drop-zone.dragover {

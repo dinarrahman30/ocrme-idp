@@ -293,9 +293,12 @@ function handleFileSelected(file) {
       <div class="drop-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
         <i data-lucide="file-check-2" style="width: 28px; height: 28px;"></i>
       </div>
-      <h4 style="font-weight: 600; margin-bottom: 0.3rem;">File Terpilih: ${file.name}</h4>
-      <p style="font-size: 0.85rem; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB — Klik "Process &amp; Extract Document" untuk mengekstrak</p>
-      <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+      <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; font-weight: 500;">File Terpilih / Selected File:</div>
+      <h4 style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.92rem; word-break: break-all; overflow-wrap: anywhere; max-width: 100%; padding: 0 0.5rem; line-height: 1.4; color: var(--text-primary);" title="${file.name}">
+        ${file.name}
+      </h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">${(file.size / 1024).toFixed(1)} KB — Klik "Process &amp; Extract Document" untuk mengekstrak</p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
         <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx">
         <button class="btn btn-secondary" style="padding: 0.4rem 0.86rem; font-size: 0.8rem;" onclick="document.getElementById('file-input').click()">
           <i data-lucide="folder-open" style="width: 14px; height: 14px;"></i> Pilih File Lain
