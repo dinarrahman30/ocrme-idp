@@ -825,6 +825,36 @@ function exportData(format) {
     a.href = url;
     a.download = `OCRMe_Export_${currentResult.metadata.doc_type || 'result'}.json`;
     a.click();
+  } else if (format === 'txt') {
+    let txtContent = `==================================================\n`;
+    txtContent += `         OCRMe DOCUMENT EXTRACTION REPORT         \n`;
+    txtContent += `==================================================\n`;
+    txtContent += `File Source: ${currentResult.metadata.source_file || 'Sample'}\n`;
+    txtContent += `Category:    ${currentResult.metadata.doc_type || 'Unknown'}\n`;
+    txtContent += `Confidence:  ${(currentResult.metadata.confidence * 100).toFixed(1)}%\n`;
+    txtContent += `OCR Engine:  ${currentResult.metadata.ocr_engine}\n`;
+    txtContent += `Method:      ${currentResult.metadata.parsing_method}\n`;
+    txtContent += `--------------------------------------------------\n\n`;
+    txtContent += `[ STRUCTURED EXTRACTED DATA ]\n`;
+    if (currentResult.data) {
+      for (const [key, val] of Object.entries(currentResult.data)) {
+        if (typeof val === 'object' && val !== null) {
+          txtContent += `${key}:\n${JSON.stringify(val, null, 2)}\n`;
+        } else {
+          txtContent += `${key}: ${val}\n`;
+        }
+      }
+    }
+    if (currentResult.raw_text) {
+      txtContent += `\n[ RAW OCR TEXT ]\n${currentResult.raw_text}\n`;
+    }
+    
+    const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `OCRMe_Export_${currentResult.metadata.doc_type || 'result'}.txt`;
+    a.click();
   } else if (format === 'csv') {
     let csvContent = "";
     const transactions = currentResult.data ? currentResult.data.transactions : null;
@@ -936,13 +966,19 @@ const I18N_DICT = {
     nav_processor: '<i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Ekstraksi Dokumen',
     nav_analytics: '<i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Ringkasan & Analitik',
     nav_accuracy: '<i data-lucide="target" style="width: 18px; height: 18px;"></i> Evaluasi Akurasi',
-    nav_guide: '<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Panduan Pengguna'
+    nav_guide: '<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Panduan Pengguna',
+    btn_download_json: '<i data-lucide="file-json" style="width: 16px; height: 16px; color: #60a5fa;"></i> Unduh JSON',
+    btn_download_txt: '<i data-lucide="file-text" style="width: 16px; height: 16px; color: #34d399;"></i> Unduh TXT',
+    btn_download_csv: '<i data-lucide="table-2" style="width: 16px; height: 16px; color: #fbbf24;"></i> Ekspor CSV'
   },
   en: {
     nav_processor: '<i data-lucide="file-text" style="width: 18px; height: 18px;"></i> Document Extraction',
     nav_analytics: '<i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i> Summary & Analytics',
     nav_accuracy: '<i data-lucide="target" style="width: 18px; height: 18px;"></i> Accuracy Evaluator',
-    nav_guide: '<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> User Guide'
+    nav_guide: '<i data-lucide="book-open" style="width: 18px; height: 18px;"></i> User Guide',
+    btn_download_json: '<i data-lucide="file-json" style="width: 16px; height: 16px; color: #60a5fa;"></i> Download JSON',
+    btn_download_txt: '<i data-lucide="file-text" style="width: 16px; height: 16px; color: #34d399;"></i> Download TXT',
+    btn_download_csv: '<i data-lucide="table-2" style="width: 16px; height: 16px; color: #fbbf24;"></i> Export CSV'
   }
 };
 

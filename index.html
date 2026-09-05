@@ -218,12 +218,15 @@
           </div>
 
           <!-- Export Actions -->
-          <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
-            <button class="btn btn-secondary" onclick="exportData('json')" style="flex: 1;">
-              <i data-lucide="download" style="width: 16px; height: 16px;"></i> Download JSON
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 1.25rem;">
+            <button class="btn btn-secondary" onclick="exportData('json')" data-i18n="btn_download_json">
+              <i data-lucide="file-json" style="width: 16px; height: 16px; color: #60a5fa;"></i> Download JSON
             </button>
-            <button class="btn btn-secondary" onclick="exportData('csv')" style="flex: 1;">
-              <i data-lucide="file-spread-sheet" style="width: 16px; height: 16px;"></i> Export CSV
+            <button class="btn btn-secondary" onclick="exportData('txt')" data-i18n="btn_download_txt">
+              <i data-lucide="file-text" style="width: 16px; height: 16px; color: #34d399;"></i> Download TXT
+            </button>
+            <button class="btn btn-secondary" onclick="exportData('csv')" data-i18n="btn_download_csv">
+              <i data-lucide="table-2" style="width: 16px; height: 16px; color: #fbbf24;"></i> Export CSV
             </button>
           </div>
         </div>
