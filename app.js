@@ -175,7 +175,32 @@ async function processRealFileOCR(file) {
       extractedRawText = `[OCR Teks Hasil Bacaan Gambar: ${file.name}]\nFormat: ${fileExt.toUpperCase()}\nUkuran: ${(file.size/1024).toFixed(1)} KB`;
     }
   } 
-  // 2. IF TEXT / JSON / CSV FILE: READ REAL FILE TEXT
+  // 2. IF PDF FILE: EXTRACT REAL PDF TEXT VIA PDF.JS IN BROWSER
+  else if (fileExt === 'pdf' && (window.pdfjsLib || window['pdfjs-dist/build/pdf'])) {
+    try {
+      const lib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+      lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await lib.getDocument({ data: arrayBuffer }).promise;
+      let fullPdfText = "";
+      for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageStrings = textContent.items.map(item => item.str).join(' ');
+        fullPdfText += `--- HALAMAN ${pageNum} ---\n` + pageStrings + '\n\n';
+      }
+      if (fullPdfText.trim().length > 15) {
+        extractedRawText = fullPdfText.trim();
+        confidenceScore = 0.98;
+      } else {
+        extractedRawText = `[PDF Rekening Koran / Dokumen Terpindai: ${file.name}]\nUkuran: ${(file.size / 1024).toFixed(1)} KB`;
+      }
+    } catch (pdfErr) {
+      console.warn("PDF.js extraction failed:", pdfErr);
+      extractedRawText = `[Ekstraksi Berkas Dokumen PDF: ${file.name}]\nUkuran: ${(file.size / 1024).toFixed(1)} KB`;
+    }
+  }
+  // 3. IF TEXT / JSON / CSV FILE: READ REAL FILE TEXT
   else if (fileType.startsWith('text/') || ['txt', 'csv', 'json', 'md', 'xml', 'html'].includes(fileExt)) {
     extractedRawText = await new Promise((resolve) => {
       const reader = new FileReader();
@@ -184,7 +209,7 @@ async function processRealFileOCR(file) {
     });
     confidenceScore = 0.99;
   }
-  // 3. OTHER DOCUMENTS (PDF, DOCX, XLSX)
+  // 4. OTHER DOCUMENTS (DOCX, XLSX, PPTX)
   else {
     extractedRawText = `[Ekstraksi Berkas Dokumen: ${file.name}]\nUkuran: ${(file.size / 1024).toFixed(1)} KB | Format: ${fileExt.toUpperCase()}\nWaktu Pemrosesan: ${new Date().toLocaleString()}\nEngine OCR: ${selectedEngine.toUpperCase()}\nStatus: Ekstraksi Berhasil dengan Tingkat Keyakinan 98.2%`;
     confidenceScore = 0.97;
