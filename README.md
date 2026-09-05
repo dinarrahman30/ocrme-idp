@@ -1,4 +1,4 @@
-# OCRMe — AI-Powered Intelligent Document Processing (IDP) & ETL Pipeline
+# OCRMe — AI-Powered Intelligent Document Processing (IDP) & Multi-Source ETL Pipeline
 
 An enterprise-grade **Intelligent Document Processing (IDP)** system and multi-source ETL pipeline designed to automate text extraction, document classification, and structured data parsing from any document stack—including invoices, receipts, tax forms, identity cards (KTP), bank statements, Microsoft Office documents (`.docx`, `.xlsx`, `.pptx`), PDFs, images, and plain text/JSON files.
 
@@ -7,6 +7,17 @@ An enterprise-grade **Intelligent Document Processing (IDP)** system and multi-s
 > - ⚡ **Vercel Web Studio (Client-Side Web Edition)**: [https://ocrme-idp.vercel.app/](https://ocrme-idp.vercel.app/)
 >
 > 🇮🇩 **Panduan Bahasa Indonesia**: Untuk panduan penggunaan aplikasi web bagi pengguna awam, silakan baca [PANDUAN_PENGGUNA.md](PANDUAN_PENGGUNA.md).
+
+---
+
+## 🌟 Key Features & Latest UI Updates
+
+- 🌐 **Bilingual Support (🇮🇩 Bahasa Indonesia & 🇬🇧 English)**: Toggle language instantly on both Streamlit App (sidebar radio) and Vercel Web Studio (header selector) with persistent `localStorage` preference.
+- 🎨 **Minimalist & Beginner-Friendly UI**: Streamlined 4-tab navigation structure (`📄 Document extraction`, `📊 Summary & analytics`, `📘 User guide`, `⚙️ Advanced & batch features`) with clean sentence-cased UI labels and high-contrast typography.
+- 🔐 **Developer Private Access Mode**: Raw database inspection, audit logs, and domain tables protected behind Developer Password Mode, keeping the public dashboard clean and secure.
+- 📊 **Visual Analytics Dashboard**: Public KPI metrics (Total Documents, Avg Confidence, Top OCR Engine, Top Category), category distribution charts, and timeline charts.
+- 📥 **Multi-Format Document Exports**: Download extraction reports in **JSON**, **TXT** (structured text report), and **CSV** formats.
+- 🔒 **User Privacy & Empty Defaults**: API Key inputs default to clean empty values (`value=""`), keeping credentials private to each user.
 
 ---
 
@@ -56,11 +67,11 @@ Real-world document processing requires handling complex layout variations: scan
                            │
                            ▼
 [ Presentation & Analytics Layer ] (`app.py`)
-  └── Streamlit Interactive Web Dashboard
-        ├── 📑 Document Processor (Live Single Document Playground & Preview)
-        ├── 📊 Database Inspector & General Analytics (KPIs, Charts, Search)
-        ├── 🎯 Accuracy Evaluator Suite (CER / WER / JSON Field Matching)
-        └── ⚙️ Batch ETL Pipeline Runner
+  └── Streamlit Interactive Web Dashboard (Bilingual ID/EN)
+        ├── 📄 Document Extraction (Single Document Playground & Upload)
+        ├── 📊 Summary & Analytics (Public Visual Dashboard & KPIs)
+        ├── 📘 User Guide (Embedded Interactive Usage Guide)
+        └── ⚙️ Advanced & Batch Features (Developer Mode, Batch ETL, Accuracy Suite)
 ```
 
 ---
@@ -192,24 +203,24 @@ Launch the Streamlit web application directly on host:
 streamlit run app.py
 ```
 Access `http://localhost:8501` to explore:
-- 📑 **Document Processor**: Live single document processing with drag-and-drop file upload or local file path input.
-- 📊 **Database & Analytics**: Real-time KPI summary, category distribution bar charts, file search bar, and interactive JSON payload inspector.
-- 🎯 **Accuracy Evaluator**: Character error rate (CER/WER) calculator and JSON field accuracy evaluator.
-- ⚙️ **Batch ETL**: 1-click folder scanner and batch processing pipeline.
+- 📄 **Document Extraction**: Live single document processing with drag-and-drop file upload or local file path input.
+- 📊 **Summary & Analytics**: Real-time KPI summary cards, category distribution bar charts, and timeline activity charts.
+- 📘 **User Guide**: Embedded interactive usage guide explaining AI models, OCR engines, and privacy.
+- ⚙️ **Advanced & Batch Features**: Developer Authentication Mode, batch folder scanner, and accuracy benchmarking suite (CER/WER & JSON).
 
-### 4. Single-File CLI Processor (`main.py`)
+### 5. Single-File CLI Processor (`main.py`)
 Process any single document from the terminal:
 ```bash
 python3 main.py --input /path/to/document.pdf --output data/output --engine easyocr --mode auto
 ```
 
-### 5. Batch ETL Directory Runner (`run_etl.py`)
+### 6. Batch ETL Directory Runner (`run_etl.py`)
 Scan and process all documents in a directory:
 ```bash
 python3 run_etl.py --input-dir data/input --output-dir data/output --db-path data/ocr_database.db
 ```
 
-### 6. Database Verification & Accuracy Evaluation
+### 7. Database Verification & Accuracy Evaluation
 ```bash
 # Inspect SQLite database tables and record counts
 python3 verify_db.py
@@ -220,7 +231,7 @@ python3 ocr_eval.py
 
 ---
 
-## 🔮 Future Roadmap (What We Would Do With More Time)
+## 🔮 Future Roadmap
 
 1. **Local Fine-Tuned Vision-LLM**: Train a lightweight local Vision Language Model (e.g. Qwen2-VL or Donut) for 100% offline, zero-API-cost visual document processing.
 2. **Vector Search & RAG Pipeline**: Integrate SQLite-VSS / ChromaDB vector embeddings to enable natural language semantic Q&A across historical document archives.
