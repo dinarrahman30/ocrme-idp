@@ -233,7 +233,7 @@ with st.sidebar:
             "OpenAI API key",
             value="",
             type="password",
-            placeholder="Masukkan OpenAI API Key Anda (sk-proj-...)",
+            placeholder="Masukkan OpenAI API Key Anda",
             help="Enter your OpenAI API Key."
         )
         if api_key_input:
@@ -247,7 +247,7 @@ with st.sidebar:
             "Anthropic API key",
             value="",
             type="password",
-            placeholder="Masukkan Anthropic API Key Anda (sk-ant-...)",
+            placeholder="Masukkan Anthropic API Key Anda",
             help="Enter your Anthropic Claude API Key."
         )
         if api_key_input:
@@ -266,7 +266,7 @@ with st.sidebar:
             value="",
             type="password",
             help="Paste your Google Gemini API key to enable AI multi-category adaptive extraction.",
-            placeholder="Masukkan Gemini API Key Anda (AIzaSy...)"
+            placeholder="Masukkan Gemini API Key Anda"
         )
         if api_key_input:
             os.environ["GEMINI_API_KEY"] = api_key_input
