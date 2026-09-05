@@ -337,11 +337,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Main Navigation Tabs
-tab_playground, tab_database, tab_eval, tab_etl = st.tabs([
+tab_playground, tab_database, tab_eval, tab_etl, tab_guide = st.tabs([
     "📑 Document processor",
     "📊 Database & analytics",
     "🎯 Accuracy evaluator",
-    "⚙️ Batch ETL pipeline"
+    "⚙️ Batch ETL pipeline",
+    "📘 Panduan pengguna"
 ])
 
 # ==============================================================================
@@ -939,3 +940,19 @@ with tab_etl:
 
             status_text.text("Batch ETL completed!")
             st.toast(f"Successfully processed {success_count} of {len(unprocessed_files)} files!", icon="🚀")
+
+# ==============================================================================
+# TAB 5: Panduan Pengguna (User Guide & Safety Documentation)
+# ==============================================================================
+with tab_guide:
+    st.markdown("#### :material/menu_book: Panduan Penggunaan Aplikasi OCRMe")
+    st.caption("Panduan lengkap penggunaan fitur, pilihan AI provider, dan jaminan keamanan data.")
+
+    guide_path = os.path.join(os.path.dirname(__file__), "PANDUAN_PENGGUNA.md")
+    if os.path.exists(guide_path):
+        with open(guide_path, "r", encoding="utf-8") as gf:
+            guide_md = gf.read()
+        with st.container(border=True):
+            st.markdown(guide_md)
+    else:
+        st.info("File `PANDUAN_PENGGUNA.md` tidak ditemukan.")
