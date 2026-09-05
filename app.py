@@ -212,6 +212,25 @@ with st.sidebar:
     st.caption("Configure AI providers, models, OCR engines, and API keys.")
     st.space("small")
 
+    # Developer Mode Authentication Toggle
+    is_developer = st.session_state.get("dev_authenticated", False)
+    dev_toggle = st.toggle("🔐 Developer mode", value=is_developer, help="Unlock raw database inspector, audit logs, and domain tables.")
+    if dev_toggle != is_developer:
+        if dev_toggle:
+            dev_pass = st.text_input("Developer password", type="password", key="dev_pass_input", placeholder="Ketik sandi developer (cth: admin)...")
+            if dev_pass in ["admin", "developer", "ocrme"]:
+                st.session_state["dev_authenticated"] = True
+                st.toast("Developer mode unlocked!", icon="🔓")
+                st.rerun()
+            elif dev_pass:
+                st.error("Sandi developer salah.", icon=":material/lock:")
+        else:
+            st.session_state["dev_authenticated"] = False
+            st.toast("Developer mode locked", icon="🔒")
+            st.rerun()
+
+    st.space("small")
+
     # AI Provider Selection Dropdown
     st.markdown("**AI provider selection**")
     ai_provider = st.selectbox(
@@ -578,48 +597,21 @@ with tab_database:
     col_hdr, col_ref = st.columns([3, 1])
     with col_hdr:
         st.markdown("#### :material/analytics: Database Inspector & General Analytics")
-        st.caption("Explore, search, filter, and inspect all parsed document records stored in SQLite.")
+        st.caption("Explore system analytics, document distribution insights, and database records.")
     with col_ref:
         if st.button("Refresh database", icon=":material/refresh:", width="stretch"):
             st.rerun()
 
     conn = sqlite3.connect(DEFAULT_DB_PATH)
+    is_dev = st.session_state.get("dev_authenticated", False)
 
-    # 1. Top-level KPI Metrics Summary Grid
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM processed_files WHERE status = 'SUCCESS'")
-        total_files = cur.fetchone()[0] or 0
-
-        cur.execute("SELECT COUNT(DISTINCT doc_type) FROM document_records")
-        total_categories = cur.fetchone()[0] or 0
-
-        cur.execute("SELECT COUNT(*) FROM document_records")
-        total_docs = cur.fetchone()[0] or 0
-
-        cur.execute("SELECT AVG(confidence) FROM document_records WHERE confidence IS NOT NULL")
-        avg_confidence = float(cur.fetchone()[0] or 0.0)
-
-        cur.execute("SELECT COUNT(*) FROM document_records WHERE parsing_method = 'llm'")
-        llm_count = cur.fetchone()[0] or 0
-        ai_share = (llm_count / total_docs * 100) if total_docs > 0 else 0.0
-
-        c1, c2, c3, c4, c5 = st.columns(5)
-        with c1:
-            st.metric("Total processed files", total_files)
-        with c2:
-            st.metric("Document categories", total_categories)
-        with c3:
-            st.metric("Total parsed records", total_docs)
-        with c4:
-            st.metric("Average confidence", f"{avg_confidence:.1%}")
-        with c5:
-            st.metric("AI extraction share", f"{ai_share:.0f}%")
-
-    except Exception as e:
-        st.caption(f"Could not load database metrics summary: {e}")
-
-    st.space("medium")
+    # Database Sub-Tabs (Visual Analytics is PUBLIC, others are DEVELOPER ONLY)
+    db_tab_visual, db_tab_records, db_tab_audit, db_tab_tables = st.tabs([
+        "📊 Visual analytics",
+        "📑 All parsed documents (Private)",
+        "📋 Audit log (Private)",
+        "🗃️ Specialized tables (Private)"
+    ])
 
     # Load full document_records dataframe for analytics and inspection
     try:
@@ -627,20 +619,103 @@ with tab_database:
     except Exception as e:
         df_docs_all = pd.DataFrame()
 
-    # Database Inspector Sub-Tabs
-    db_tab1, db_tab2, db_tab3, db_tab4 = st.tabs([
-        "📑 All parsed documents",
-        "📊 Visual analytics",
-        "📋 Audit log",
-        "🗃️ Specialized tables"
-    ])
+    # --------------------------------------------------------------------------
+    # Sub-tab 1: PUBLIC — Visual Analytics Dashboard (Beautified)
+    # --------------------------------------------------------------------------
+    with db_tab_visual:
+        # Top-level KPI Metrics Summary Grid
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM processed_files WHERE status = 'SUCCESS'")
+            total_files = cur.fetchone()[0] or 0
+
+            cur.execute("SELECT COUNT(DISTINCT doc_type) FROM document_records")
+            total_categories = cur.fetchone()[0] or 0
+
+            cur.execute("SELECT COUNT(*) FROM document_records")
+            total_docs = cur.fetchone()[0] or 0
+
+            cur.execute("SELECT AVG(confidence) FROM document_records WHERE confidence IS NOT NULL")
+            avg_confidence = float(cur.fetchone()[0] or 0.0)
+
+            cur.execute("SELECT COUNT(*) FROM document_records WHERE parsing_method = 'llm'")
+            llm_count = cur.fetchone()[0] or 0
+            ai_share = (llm_count / total_docs * 100) if total_docs > 0 else 0.0
+
+            c1, c2, c3, c4, c5 = st.columns(5)
+            with c1:
+                st.metric("Total processed files", total_files)
+            with c2:
+                st.metric("Document categories", total_categories)
+            with c3:
+                st.metric("Total parsed records", total_docs)
+            with c4:
+                st.metric("Average confidence", f"{avg_confidence:.1%}")
+            with c5:
+                st.metric("AI extraction share", f"{ai_share:.0f}%")
+
+        except Exception as e:
+            st.caption(f"Could not load database metrics summary: {e}")
+
+        st.space("medium")
+
+        if df_docs_all.empty:
+            st.info("Belum ada data analitik. Silakan proses dokumen terlebih dahulu pada tab Document processor.", icon=":material/info:")
+        else:
+            st.markdown("##### 📈 Distribution & performance insights")
+            
+            c_chart1, c_chart2 = st.columns(2, gap="medium")
+            
+            with c_chart1:
+                with st.container(border=True):
+                    st.markdown("**:material/folder: Document breakdown by category**")
+                    cat_counts = df_docs_all["doc_type"].value_counts().reset_index()
+                    cat_counts.columns = ["Category", "Count"]
+                    st.bar_chart(cat_counts, x="Category", y="Count", color="#38bdf8")
+
+            with c_chart2:
+                with st.container(border=True):
+                    st.markdown("**:material/auto_awesome: Parsing engine breakdown**")
+                    method_counts = df_docs_all["parsing_method"].value_counts().reset_index()
+                    method_counts.columns = ["Method", "Count"]
+                    st.bar_chart(method_counts, x="Method", y="Count", color="#818cf8")
+
+            st.space("small")
+
+            c_chart3, c_chart4 = st.columns(2, gap="medium")
+            
+            with c_chart3:
+                with st.container(border=True):
+                    st.markdown("**:material/verified: Average confidence score per category**")
+                    if "confidence" in df_docs_all.columns:
+                        conf_avg = df_docs_all.groupby("doc_type")["confidence"].mean().reset_index()
+                        conf_avg.columns = ["Category", "Confidence (%)"]
+                        conf_avg["Confidence (%)"] = (conf_avg["Confidence (%)"] * 100).round(1)
+                        st.bar_chart(conf_avg, x="Category", y="Confidence (%)", color="#34d399")
+
+            with c_chart4:
+                with st.container(border=True):
+                    st.markdown("**:material/schedule: Processing timeline activity**")
+                    if "processed_at" in df_docs_all.columns:
+                        df_time = df_docs_all.copy()
+                        df_time["date"] = pd.to_datetime(df_time["processed_at"]).dt.date
+                        time_counts = df_time.groupby("date").size().reset_index(name="Volume")
+                        st.line_chart(time_counts, x="date", y="Volume", color="#f43f5e")
+
+    # Helper function for developer-only tabs
+    def render_dev_lock_notice():
+        with st.container(border=True):
+            st.markdown("##### :material/shield_lock: Developer Private Access Required")
+            st.info("Inspeksi raw database, audit log, dan tabel spesifik ini diproteksi khusus untuk Developer. Aktifkan **Developer mode** pada sidebar sebelah kiri (masukkan password `admin`) untuk membuka akses.", icon=":material/lock:")
 
     # --------------------------------------------------------------------------
-    # Sub-tab 1: All parsed documents with filter & JSON viewer
+    # Sub-tab 2: PRIVATE — All parsed documents with filter & JSON viewer
     # --------------------------------------------------------------------------
-    with db_tab1:
-        if df_docs_all.empty:
-            st.info("No document records found in database. Process documents in the Document processor tab first.", icon=":material/info:")
+    with db_tab_records:
+        if not is_dev:
+            render_dev_lock_notice()
+        elif df_docs_all.empty:
+            st.info("No document records found in database.", icon=":material/info:")
         else:
             # Filter bar
             f_col1, f_col2, f_col3 = st.columns([1, 1, 2], gap="small")
@@ -717,91 +792,62 @@ with tab_database:
                     st.caption("No document matching current filters.")
 
     # --------------------------------------------------------------------------
-    # Sub-tab 2: Document Analytics & Visual Distribution
+    # Sub-tab 3: PRIVATE — Processed files audit log
     # --------------------------------------------------------------------------
-    with db_tab2:
-        if df_docs_all.empty:
-            st.info("No analytics available yet. Process documents to view insights.")
+    with db_tab_audit:
+        if not is_dev:
+            render_dev_lock_notice()
         else:
-            st.markdown("##### Category & method distribution")
-            
-            c_chart1, c_chart2 = st.columns(2, gap="medium")
-            
-            with c_chart1:
-                with st.container(border=True):
-                    st.markdown("**Documents by category (`doc_type`)**")
-                    cat_counts = df_docs_all["doc_type"].value_counts().reset_index()
-                    cat_counts.columns = ["Category", "Document count"]
-                    st.bar_chart(cat_counts, x="Category", y="Document count")
-
-            with c_chart2:
-                with st.container(border=True):
-                    st.markdown("**Parsing method breakdown**")
-                    method_counts = df_docs_all["parsing_method"].value_counts().reset_index()
-                    method_counts.columns = ["Method", "Count"]
-                    st.bar_chart(method_counts, x="Method", y="Count")
-
-            st.space("small")
-
-            st.markdown("##### Average confidence per category")
-            with st.container(border=True):
-                if "confidence" in df_docs_all.columns:
-                    conf_avg = df_docs_all.groupby("doc_type")["confidence"].mean().reset_index()
-                    conf_avg.columns = ["Category", "Average confidence"]
-                    conf_avg["Average confidence"] = conf_avg["Average confidence"] * 100
-                    st.bar_chart(conf_avg, x="Category", y="Average confidence")
-
-    # --------------------------------------------------------------------------
-    # Sub-tab 3: Processed files audit log
-    # --------------------------------------------------------------------------
-    with db_tab3:
-        try:
-            df_log = pd.read_sql_query("SELECT * FROM processed_files ORDER BY processed_at DESC", conn)
-            
-            succ_count = len(df_log[df_log["status"] == "SUCCESS"])
-            fail_count = len(df_log[df_log["status"] == "FAILED"])
-            
-            l1, l2 = st.columns(2)
-            with l1:
-                st.metric("Successfully processed files", f"{succ_count}")
-            with l2:
-                st.metric("Failed processing attempts", f"{fail_count}")
-
-            st.space("small")
-            st.dataframe(df_log, width="stretch")
-        except Exception as e:
-            st.caption(f"Could not load processed files log: {e}")
-
-    # --------------------------------------------------------------------------
-    # Sub-tab 4: Specialized tables (KTP & Bank Transactions)
-    # --------------------------------------------------------------------------
-    with db_tab4:
-        st.markdown("##### Specialized structured tables inspector")
-        st.caption("Inspect domain-specific tables for structured bank transactions or identity cards.")
-
-        with st.expander("💳 Bank transactions table (`bank_transactions`)", icon=":material/credit_card:"):
             try:
-                df_tx_all = pd.read_sql_query("SELECT * FROM bank_transactions ORDER BY id DESC", conn)
-                if df_tx_all.empty:
-                    st.caption("No bank statement transaction records found.")
-                else:
-                    st.dataframe(df_tx_all, width="stretch")
-                    if "type" in df_tx_all.columns:
-                        st.markdown("###### Debit vs credit summary by file")
-                        chart_data = df_tx_all.groupby(["file_path", "type"])["amount"].sum().unstack(fill_value=0)
-                        st.bar_chart(chart_data)
-            except Exception as e:
-                st.caption(f"Error loading bank transactions: {e}")
+                df_log = pd.read_sql_query("SELECT * FROM processed_files ORDER BY processed_at DESC", conn)
+                
+                succ_count = len(df_log[df_log["status"] == "SUCCESS"])
+                fail_count = len(df_log[df_log["status"] == "FAILED"])
+                
+                l1, l2 = st.columns(2)
+                with l1:
+                    st.metric("Successfully processed files", f"{succ_count}")
+                with l2:
+                    st.metric("Failed processing attempts", f"{fail_count}")
 
-        with st.expander("🪪 KTP records table (`ktp_records`)", icon=":material/badge:"):
-            try:
-                df_ktp = pd.read_sql_query("SELECT * FROM ktp_records ORDER BY id DESC", conn)
-                if df_ktp.empty:
-                    st.caption("No KTP records found.")
-                else:
-                    st.dataframe(df_ktp, width="stretch")
+                st.space("small")
+                st.dataframe(df_log, width="stretch")
             except Exception as e:
-                st.caption(f"Error loading KTP records: {e}")
+                st.caption(f"Could not load processed files log: {e}")
+
+    # --------------------------------------------------------------------------
+    # Sub-tab 4: PRIVATE — Specialized tables (KTP & Bank Transactions)
+    # --------------------------------------------------------------------------
+    with db_tab_tables:
+        if not is_dev:
+            render_dev_lock_notice()
+        else:
+            st.markdown("##### Specialized structured tables inspector")
+            st.caption("Inspect domain-specific tables for structured bank transactions or identity cards.")
+
+            with st.expander("💳 Bank transactions table (`bank_transactions`)", icon=":material/credit_card:"):
+                try:
+                    df_tx_all = pd.read_sql_query("SELECT * FROM bank_transactions ORDER BY id DESC", conn)
+                    if df_tx_all.empty:
+                        st.caption("No bank statement transaction records found.")
+                    else:
+                        st.dataframe(df_tx_all, width="stretch")
+                        if "type" in df_tx_all.columns:
+                            st.markdown("###### Debit vs credit summary by file")
+                            chart_data = df_tx_all.groupby(["file_path", "type"])["amount"].sum().unstack(fill_value=0)
+                            st.bar_chart(chart_data)
+                except Exception as e:
+                    st.caption(f"Error loading bank transactions: {e}")
+
+            with st.expander("🪪 KTP records table (`ktp_records`)", icon=":material/badge:"):
+                try:
+                    df_ktp = pd.read_sql_query("SELECT * FROM ktp_records ORDER BY id DESC", conn)
+                    if df_ktp.empty:
+                        st.caption("No KTP records found.")
+                    else:
+                        st.dataframe(df_ktp, width="stretch")
+                except Exception as e:
+                    st.caption(f"Error loading KTP records: {e}")
 
     conn.close()
 
