@@ -6,7 +6,7 @@
 [![Docker Compose](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An enterprise-grade **Intelligent Document Processing (IDP)** system and multi-source ETL pipeline designed to automate text extraction, document classification, and structured data parsing from complex document stacks—including invoices, receipts, tax forms, identity cards (KTP), bank statements, Microsoft Office documents (`.docx`, `.xlsx`, `.pptx`), PDFs, images, and plain text/JSON files.
+An enterprise-grade **Intelligent Document Processing (IDP)** system and multi-source ETL pipeline designed to automate text extraction, document classification, and structured data parsing from complex document stacks including invoices, receipts, tax forms, identity cards (KTP), bank statements, Microsoft Office documents (`.docx`, `.xlsx`, `.pptx`), PDFs, images, and plain text/JSON files.
 
 > 🌐 **Live Demo & Deployments**:
 > - 🚀 **Streamlit Cloud App (Deep Learning & Python Backend)**: [https://ocrme-idp.streamlit.app/](https://ocrme-idp.streamlit.app/)
